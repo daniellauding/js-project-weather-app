@@ -30,10 +30,26 @@ Focus on **writing strongly-typed, clean code** while learning how to:
 - Set up TypeScript & JS
 - Netlify setup
 
+To do:
+  - Hämta APIn från SMHI
+
+  - Hämta vilka parametrar:
+    Meta: condition, dagens temp, sunrise, sunset
+    Condition: väder, long/lat
+    Veckolista: Dagar fr.o.m dagens, dagens väder
+    Tema: condition
+
+
+Stretch goal: 
+  Sökruta: flera long/lat
+
+- vilka types i TS
 
 
 
 
+https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint
+https://blog.logrocket.com/9-essential-vs-code-extensions-typescript/
 
 
 
