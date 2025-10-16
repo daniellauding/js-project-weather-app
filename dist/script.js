@@ -1,4 +1,17 @@
-const testerBox = document.getElementById('tester');
+let timeSeries = 72;
+const cities = {
+    stockholm: {
+        name: "Stockholm",
+        lat: 59.341952,
+        lon: 18.053873
+    }
+};
+// const names = Object.keys(cities);
+// console.log(names); // 👉 ["stockholm"]
+// console.log(names[0]); // 👉 "stockholm"
+console.log(cities.stockholm.lat);
+const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
+const wrapper = document.getElementById('wrapper');
 const metaBox = () => {
     const div = document.createElement('div');
     div.id = "meta";
@@ -32,9 +45,101 @@ const conditionBox = () => {
   `;
     return div;
 };
-testerBox?.appendChild(conditionBox());
-testerBox?.appendChild(metaBox());
+const weatherWeekBox = () => {
+    const div = document.createElement('div');
+    div.id = "weather-week";
+    div.innerHTML = `
+    <div id="weather-week">
+      <ul class="weather-week-list">
+        <li class="weather-week-list-item">
+          <p class="weather-week-list-item-day">Monday</p> 
+          <p class="weather-week-list-item-temp">23°C</p>
+        </li>
+        <li class="weather-week-list-item">
+          <p class="weather-week-list-item-day">Tuesday</p> 
+          <p class="weather-week-list-item-temp">23°C</p>
+        </li>
+        <li class="weather-week-list-item">
+          <p class="weather-week-list-item-day">Wednesday</p> 
+          <p class="weather-week-list-item-temp">23°C</p>
+        </li>
+        <li class="weather-week-list-item">
+          <p class="weather-week-list-item-day">Thursday</p> 
+          <p class="weather-week-list-item-temp">23°C</p>
+        </li>
+        <li class="weather-week-list-item">
+          <p class="weather-week-list-item-day">Friday</p> 
+          <p class="weather-week-list-item-temp">23°C</p>
+        </li>
+        <li class="weather-week-list-item">
+          <p class="weather-week-list-item-day">Saturday</p> 
+          <p class="weather-week-list-item-temp">23°C</p>
+        </li>
+        <li class="weather-week-list-item">
+          <p class="weather-week-list-item-day">Sunday</p> 
+          <p class="weather-week-list-item-temp">23°C</p>
+        </li>
+      </ul>
+    </div>
+  `;
+    return div;
+};
+wrapper?.appendChild(metaBox());
+wrapper?.appendChild(conditionBox());
+wrapper?.appendChild(weatherWeekBox());
+const fetchWeatherAPI = async () => {
+    try {
+        const response = await fetch(API_URL);
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        console.log(result);
+        console.log("I stad:", cities.stockholm.name);
+        console.log("En nivå in från response:", result.timeSeries[0].data);
+        console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
+        console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
+    }
+    catch (error) {
+        console.log(`Error fetching: ${error}`);
+    }
+};
+fetchWeatherAPI();
+const now = new Date();
+let weekday = now.getDay();
+console.log('Datum:', now);
+console.log('Veckodag:', weekday);
 export {};
+// Hur får vi ihop:
+// --
+// Idag
+// Imorgon
+// ..
+// ..
+// == som en lista i konsolen?
+// timeseries
+// [0]
+// -- data
+// ---- air_temperature
+// ---- symbol_code
+// ---- 
+// ---- 
+// ---- 
+// ---- 
+// Hämta vilka parametrar:
+// –– Meta:
+// –––– condition
+// –––– dagens temp
+// –––– sunrise
+// –––– sunset
+// Condition:
+// –––– väder
+// –––– lon/lat
+// Veckolista:
+// –––– Dagar fr.o.m dagens,
+// –––– dagens väder
+// Tema:
+// –––– condition
 // “Gör en ny liten låda (div) och skriv in lite text och HTML i den.
 // När du är klar, lämna tillbaka lådan.”
 // 	•	const metaBox = (): HTMLElement => { ... }
