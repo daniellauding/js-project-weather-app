@@ -96,19 +96,43 @@ const fetchWeatherAPI = async () => {
         }
         console.log(result);
         console.log("I stad:", cities.stockholm.name);
-        console.log("En nivå in från response:", result.timeSeries[0].data);
+        console.log("En nivå in från response:", result.timeSeries[0].data); // Första väderpunkten i listan.
         console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
         console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
+        const now = new Date(); // new Date() ger dig ett objekt som representerar just nu.
+        // let tomorrow = now;  både now och tomorrow pekar på samma objekt i minnet.
+        let tomorrow = new Date(); // Det här skapar ett nytt datumobjekt med exakt samma tid och datum som now. …ändras bara tomorrow, inte now.
+        // let tomorrow = new Date(now.getTime()); Alternativt, klona med getTime() Det gör samma sak – men visar tydligare att du klonar utifrån tidsstämpeln.
+        // tomorrow.setDate(now.getDate() + 1); så ändras också now – eftersom det är samma sak.
+        for (let i = 0; i < 7; i++) { // Gör samma sak sju gånger, en gång för varje dag
+            const day = new Date(now); // Skapa en NY kopia av dagens datum varje gång i loopen
+            day.setDate(now.getDate() + i); // Lägg till i dagar på kopian, kan räkna dagar med setDate(): "Ta dagens datum, lägg till 1, och hoppa dit!"
+            // hämta väder-data för den dagen (just nu tar vi bara i:te värdet)
+            const temperature = result.timeSeries[i]?.data.air_temperature; // Men du vill ha en temperatur per dag.
+            const formatted = day.toLocaleDateString('sv-SE', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+            });
+            console.log(formatted, "→ temperatur:", temperature, "°C"); // Logga resultatet
+        }
+        // Tänk dig att du har en låda (ett objekt).
+        // now = en etikett du sätter på lådan.
+        // När du gör tomorrow = now, sätter du en till etikett på samma låda.
+        // Så när du lägger något nytt i lådan (ändrar datumet),
+        // så ser båda etiketterna samma sak – lådan har ändrats.
+        let weekday = now.getDay();
+        console.log('Datum:', now);
+        console.log('Veckodag:', weekday);
+        console.log('Dag:', now);
+        console.log('Imorgon:', tomorrow);
+        console.log('Veckans väder:', result.timeSeries[0]);
     }
     catch (error) {
         console.log(`Error fetching: ${error}`);
     }
 };
 fetchWeatherAPI();
-const now = new Date();
-let weekday = now.getDay();
-console.log('Datum:', now);
-console.log('Veckodag:', weekday);
 export {};
 // Hur får vi ihop:
 // --
