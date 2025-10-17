@@ -6,20 +6,21 @@ const cities = {
         lon: 18.053873
     }
 };
-// const names = Object.keys(cities);
-// console.log(names); // 👉 ["stockholm"]
-// console.log(names[0]); // 👉 "stockholm"
 console.log(cities.stockholm.lat);
 const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
 const wrapper = document.getElementById('wrapper');
-const metaBox = () => {
+const metaBox = (result) => {
     const div = document.createElement('div');
     div.id = "meta";
+    let conditionNow = result.timeSeries[0].data.symbol_code;
+    let temperatureNow = result.timeSeries[0].data.air_temperature;
+    let sunriseToday = "07:00";
+    let sunsetToday = "20:00";
     div.innerHTML = `
     <ul class="meta-list">
-      <li class="meta-list-item">Clear sky | 23°C</li>
-      <li class="meta-list-item">Sunrise 08:00</li>
-      <li class="meta-list-item">Sunset 22:30</li>
+      <li class="meta-list-item">${conditionNow} | ${temperatureNow}°C</li>
+      <li class="meta-list-item">Sunrise ${sunriseToday}</li>
+      <li class="meta-list-item">Sunset ${sunsetToday}</li>
     </ul>
   `;
     return div;
@@ -45,48 +46,40 @@ const conditionBox = () => {
   `;
     return div;
 };
-const weatherWeekBox = () => {
+const weekdays = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
+];
+const today = new Date(); //59.341952
+// const weekdayNow = today.getDay(); //5
+const weatherWeekBox = (result) => {
     const div = document.createElement('div');
     div.id = "weather-week";
+    let listItems = '';
+    for (let i = 0; i < weekdays.length; i++) {
+        const day = new Date(today);
+        day.setDate(today.getDate() + i);
+        const week = weekdays[day.getDay()];
+        const dayTemp = result.timeSeries[i].data.air_temperature;
+        // räkna ut avg väder
+        // konvertera air_temp till -> dyngstemp
+        listItems += `
+      <li class="weather-week-list-item">
+        <p class="weather-week-list-item-day">${week}</p> 
+        <p class="weather-week-list-item-temp">${dayTemp}°C</p>
+      </li>
+    `;
+    }
     div.innerHTML = `
-    <div id="weather-week">
-      <ul class="weather-week-list">
-        <li class="weather-week-list-item">
-          <p class="weather-week-list-item-day">Monday</p> 
-          <p class="weather-week-list-item-temp">23°C</p>
-        </li>
-        <li class="weather-week-list-item">
-          <p class="weather-week-list-item-day">Tuesday</p> 
-          <p class="weather-week-list-item-temp">23°C</p>
-        </li>
-        <li class="weather-week-list-item">
-          <p class="weather-week-list-item-day">Wednesday</p> 
-          <p class="weather-week-list-item-temp">23°C</p>
-        </li>
-        <li class="weather-week-list-item">
-          <p class="weather-week-list-item-day">Thursday</p> 
-          <p class="weather-week-list-item-temp">23°C</p>
-        </li>
-        <li class="weather-week-list-item">
-          <p class="weather-week-list-item-day">Friday</p> 
-          <p class="weather-week-list-item-temp">23°C</p>
-        </li>
-        <li class="weather-week-list-item">
-          <p class="weather-week-list-item-day">Saturday</p> 
-          <p class="weather-week-list-item-temp">23°C</p>
-        </li>
-        <li class="weather-week-list-item">
-          <p class="weather-week-list-item-day">Sunday</p> 
-          <p class="weather-week-list-item-temp">23°C</p>
-        </li>
-      </ul>
-    </div>
+    <ul class="weather-week-list">${listItems}</ul>
   `;
     return div;
 };
-wrapper?.appendChild(metaBox());
-wrapper?.appendChild(conditionBox());
-wrapper?.appendChild(weatherWeekBox());
 const fetchWeatherAPI = async () => {
     try {
         const response = await fetch(API_URL);
@@ -99,34 +92,9 @@ const fetchWeatherAPI = async () => {
         console.log("En nivå in från response:", result.timeSeries[0].data); // Första väderpunkten i listan.
         console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
         console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
-        const now = new Date(); // new Date() ger dig ett objekt som representerar just nu.
-        // let tomorrow = now;  både now och tomorrow pekar på samma objekt i minnet.
-        let tomorrow = new Date(); // Det här skapar ett nytt datumobjekt med exakt samma tid och datum som now. …ändras bara tomorrow, inte now.
-        // let tomorrow = new Date(now.getTime()); Alternativt, klona med getTime() Det gör samma sak – men visar tydligare att du klonar utifrån tidsstämpeln.
-        // tomorrow.setDate(now.getDate() + 1); så ändras också now – eftersom det är samma sak.
-        for (let i = 0; i < 7; i++) { // Gör samma sak sju gånger, en gång för varje dag
-            const day = new Date(now); // Skapa en NY kopia av dagens datum varje gång i loopen
-            day.setDate(now.getDate() + i); // Lägg till i dagar på kopian, kan räkna dagar med setDate(): "Ta dagens datum, lägg till 1, och hoppa dit!"
-            // hämta väder-data för den dagen (just nu tar vi bara i:te värdet)
-            const temperature = result.timeSeries[i]?.data.air_temperature; // Men du vill ha en temperatur per dag.
-            const formatted = day.toLocaleDateString('sv-SE', {
-                weekday: 'long',
-                month: 'short',
-                day: 'numeric'
-            });
-            console.log(formatted, "→ temperatur:", temperature, "°C"); // Logga resultatet
-        }
-        // Tänk dig att du har en låda (ett objekt).
-        // now = en etikett du sätter på lådan.
-        // När du gör tomorrow = now, sätter du en till etikett på samma låda.
-        // Så när du lägger något nytt i lådan (ändrar datumet),
-        // så ser båda etiketterna samma sak – lådan har ändrats.
-        let weekday = now.getDay();
-        console.log('Datum:', now);
-        console.log('Veckodag:', weekday);
-        console.log('Dag:', now);
-        console.log('Imorgon:', tomorrow);
-        console.log('Veckans väder:', result.timeSeries[0]);
+        wrapper?.appendChild(metaBox(result));
+        wrapper?.appendChild(conditionBox());
+        wrapper?.appendChild(weatherWeekBox(result));
     }
     catch (error) {
         console.log(`Error fetching: ${error}`);
@@ -134,64 +102,4 @@ const fetchWeatherAPI = async () => {
 };
 fetchWeatherAPI();
 export {};
-// Hur får vi ihop:
-// --
-// Idag
-// Imorgon
-// ..
-// ..
-// == som en lista i konsolen?
-// timeseries
-// [0]
-// -- data
-// ---- air_temperature
-// ---- symbol_code
-// ---- 
-// ---- 
-// ---- 
-// ---- 
-// Hämta vilka parametrar:
-// –– Meta:
-// –––– condition
-// –––– dagens temp
-// –––– sunrise
-// –––– sunset
-// Condition:
-// –––– väder
-// –––– lon/lat
-// Veckolista:
-// –––– Dagar fr.o.m dagens,
-// –––– dagens väder
-// Tema:
-// –––– condition
-// “Gör en ny liten låda (div) och skriv in lite text och HTML i den.
-// När du är klar, lämna tillbaka lådan.”
-// 	•	const metaBox = (): HTMLElement => { ... }
-// betyder: “Det här är en funktion som gör en HTML-låda och ger tillbaka en.”
-// 	•	document.createElement('div') skapar en ny, tom <div> i JavaScript (inte i HTML-filen ännu).
-// 	•	div.innerHTML = ... fyller lådan med innehåll (HTML-lista med väderdata).
-// 	•	return div; skickar tillbaka den färdiga lådan till den som ropade på funktionen.
-//  as HTMLElement;
-// …så säger du till TypeScript:
-// “Lita på mig, jag vet att det här elementet finns — det kommer inte vara null.”
-// 👉 Då försvinner säkerhetskontrollen.
-// Om elementet inte finns i DOM:en får du en runtime error (t.ex. Cannot read properties of null).
-// if (testerBox) {
-//   testerBox.appendChild(metaBox());
-// }
-// const testerBox = document.getElementById('tester') as HTMLElement | null;
-// const metaBox = (): HTMLElement => {
-//   const div = document.createElement('div');
-//   div.innerHTML = `
-//     <ul class="meta-list">
-//       <li class="meta-list-item">Clear sky | 23°C</li>
-//       <li class="meta-list-item">Sunrise 08:00</li>
-//       <li class="meta-list-item">Sunset 22:30</li>
-//     </ul>
-//   `;
-//   return div;
-// };
-// testerBox?.appendChild(metaBox());
-// •	| används i typer → “kan vara det här eller det där”.
-// •	|| används i logik → “om det här inte finns, ta det andra istället”.
 //# sourceMappingURL=script.js.map
