@@ -19,6 +19,37 @@ const weekdays = [
  'Friday',
  'Saturday'
 ]
+
+const symbolCodeText = [
+ "Clear sky",
+ "Nearly clear sky",
+ "Variable cloudiness",
+ "Halfclear sky",
+ "Cloudy sky",
+ "Overcast",
+ "Fog",
+ "Light rain showers",
+ "Moderate rain showers",
+ "Heavy rain showers",
+ "Thunderstorm",
+ "Light sleet showers",
+ "Moderate sleet showers",
+ "Heavy sleet showers",
+ "Light snow showers",
+ "Moderate snow showers",
+ "Heavy snow showers",
+ "Light rain",
+ "Moderate rain",
+ "Heavy rain",
+ "Thunder",
+ "Light sleet",
+ "Moderate sleet",
+ "Heavy sleet",
+ "Light snowfall",
+ "Moderate snowfall",
+ "Heavy snowfall"
+];
+
 const today = new Date(); //59.341952
 // const weekdayNow = today.getDay(); //5
 
@@ -37,7 +68,8 @@ const metaBox = (result: any): HTMLElement => {
   const div = document.createElement('div');
   div.id = "meta"
   
-  let conditionNow = result.timeSeries[0].data.symbol_code;
+  let symbolCodeFromAPI = result.timeSeries[0].data.symbol_code;
+  let conditionNow = symbolCodeText[symbolCodeFromAPI -1] || "Unknown condition";
   let temperatureNow = result.timeSeries[0].data.air_temperature;
   let sunriseToday = "07:00";
   let sunsetToday = "20:00";
@@ -127,8 +159,7 @@ const fetchWeatherAPI = async() => {
     console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
 
     let code = result.timeSeries[0].data.symbol_code;
-    code = 8
-    
+    code = 20
     document.body.classList.remove("theme-rainy");
   
     if(code === 1 || code  === 2 || code  === 3 || code === 4) {
