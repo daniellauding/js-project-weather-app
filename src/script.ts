@@ -1,5 +1,6 @@
 let timeSeries = 72;
 
+// Objekt med städer och koordinater
 const cities = {
   stockholm: {
     name: "Stockholm",
@@ -7,6 +8,7 @@ const cities = {
     lon: 18.053873
   }
 }
+
 
 console.log(cities.stockholm.lat);
 
