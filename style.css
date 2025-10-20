@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+
+  /* THEMES */
+  /* Themes depending on symbol-code from API */
+  --sunny-bg-color: #F7E9B9;
+  --sunny-text-color: #2A5510;
+
+  --rainy-bg-color: #bee9f9;
+  --rainy-text-color: #174b67;
+
+  --cloudy-bg-color: #f9fdfe;
+  --cloudy-text-color: #f37676;
+
+  --font-size: 21px;
+  --font-family: "Montserrat", sans-serif;
+
+  --wrapper-margin: 40px auto;
+  --wrapper-max-width: 295px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+}
+
+/* === Theme structure */
+
+body.theme-sunny {
+  background-color: var(--sunny-bg-color);
+  color: var(--sunny-text-color);
+}
+
+body.theme-rainy {
+  background-color: var(--rainy-bg-color);
+  color: var(--rainy-text-color);
+}
+
+body.theme-cloudy {
+  background-color: var(--cloudy-bg-color);
+  color: var(--cloudy-text-color);
+}
+
+#wrapper {
+  display: flex;
+  flex-direction: column;
+  margin: var(--wrapper-margin);
+  max-width: var(--wrapper-max-width);
+  gap: 56px;
+}
+
+/* === Component: Meta block */
+
+.meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* === Component: Weather hondition */
+
+#weather-condition {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.weather-condition-text-heading {
+  font-size: 37px;
+  font-weight: bold;
+}
+
+.weather-week-list-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted;
+  padding: 6px 0;
+}
+
+.weather-week-list-item:last-child {
+  border: 0;
+}
