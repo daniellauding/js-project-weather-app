@@ -1,5 +1,7 @@
+//Hur många timmar framåt vi vill hämta från API:t.
 let timeSeries = 72;
-
+// stad/koordinator 
+// * todo utöka med fler städer
 const cities = {
   stockholm: {
     name: "Stockholm",
@@ -10,10 +12,13 @@ const cities = {
 
 console.log(cities.stockholm.lat);
 
+//Bygger API-URL till SMHI:s öppna data för prognoser.
 const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
 
+//Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
 
+//UI-komponent 1: Metabox
 const metaBox = (result: any): HTMLElement => { 
   const div = document.createElement('div');
   div.id = "meta"
@@ -23,6 +28,7 @@ const metaBox = (result: any): HTMLElement => {
   let sunriseToday = "07:00";
   let sunsetToday = "20:00";
 
+//Bygger våran Meta information högst upp på sidan. I index.html
   div.innerHTML = `
     <ul class="meta-list">
       <li class="meta-list-item">${conditionNow} | ${temperatureNow}°C</li>
@@ -34,6 +40,7 @@ const metaBox = (result: any): HTMLElement => {
   return div;
 };
 
+// UI-komponent 2: ConditonBox Ikon + 
 const conditionBox = (): HTMLElement => {
   const div = document.createElement('div');
   div.id = "weather-condition"
@@ -57,7 +64,7 @@ const conditionBox = (): HTMLElement => {
  
   return div;
 };
-
+// En array som listar veckodagar
 const weekdays = [
  'Sunday',
  'Monday',
@@ -98,7 +105,7 @@ const weatherWeekBox = (result: any): HTMLElement => {
 
   return div;
 };
-
+//Fetching
 const fetchWeatherAPI = async() => {
   try {
     const response = await fetch(API_URL);
@@ -115,10 +122,10 @@ const fetchWeatherAPI = async() => {
     wrapper?.appendChild(metaBox(result));
     wrapper?.appendChild(conditionBox());
     wrapper?.appendChild(weatherWeekBox(result));
-
+//Fångar nätverks/parsefel m.m.    
   } catch(error) {
     console.log(`Error fetching: ${error}`);
   }
 }
-
+//kickar igång allt!
 fetchWeatherAPI();
