@@ -6,6 +6,136 @@ const cities = {
         name: "Stockholm",
         lat: 59.341952,
         lon: 18.053873
+    },
+    göteborg: {
+        name: "Göteborg",
+        lat: 57.702213,
+        lon: 11.967860
+    },
+    malmö: {
+        name: "Malmö",
+        lat: 55.603875,
+        lon: 13.007694
+    },
+    uppsala: {
+        name: "Uppsala",
+        lat: 59.860460,
+        lon: 17.654294
+    },
+    linköping: {
+        name: "Linköping",
+        lat: 58.414875,
+        lon: 15.614858
+    },
+    örebro: {
+        name: "Örebro",
+        lat: 59.275162,
+        lon: 15.216865
+    },
+    västerås: {
+        name: "Västerås",
+        lat: 59.604728,
+        lon: 16.542310
+    },
+    helsingborg: {
+        name: "Helsingborg",
+        lat: 56.065472,
+        lon: 12.796159
+    },
+    jönköping: {
+        name: "Jönköping",
+        lat: 57.782668,
+        lon: 14.164872
+    },
+    norrköping: {
+        name: "Norrköping",
+        lat: 58.586242,
+        lon: 16.175980
+    },
+    umeå: {
+        name: "Umeå",
+        lat: 63.824125,
+        lon: 20.268025
+    },
+    gävle: {
+        name: "Gävle",
+        lat: 60.672642,
+        lon: 17.147048
+    },
+    borås: {
+        name: "Borås",
+        lat: 57.720598,
+        lon: 12.946360
+    },
+    sundsvall: {
+        name: "Sundsvall",
+        lat: 62.388709,
+        lon: 17.306922
+    },
+    karlskrona: {
+        name: "Karlskrona",
+        lat: 56.161541,
+        lon: 15.601851
+    },
+    borlänge: {
+        name: "Borlänge",
+        lat: 60.483976,
+        lon: 15.440760
+    },
+    åmål: {
+        name: "Åmål",
+        lat: 59.049932,
+        lon: 12.701510
+    },
+    visby: {
+        name: "Visby",
+        lat: 57.634809,
+        lon: 18.294846
+    },
+    halmstad: {
+        name: "Halmstad",
+        lat: 56.675527,
+        lon: 12.878813
+    },
+    hudiksvall: {
+        name: "Hudiksvall",
+        lat: 61.727594,
+        lon: 17.107203
+    },
+    sveg: {
+        name: "Sveg",
+        lat: 62.035289,
+        lon: 14.362230
+    },
+    östersund: {
+        name: "Östersund",
+        lat: 63.175590,
+        lon: 14.654874
+    },
+    kiruna: {
+        name: "Kiruna",
+        lat: 67.853888,
+        lon: 20.227567
+    },
+    luleå: {
+        name: "Luleå",
+        lat: 65.586872,
+        lon: 22.175487
+    },
+    karlstad: {
+        name: "Karlstad",
+        lat: 59.376372,
+        lon: 13.494644
+    },
+    örnsköldsvik: {
+        name: "Örnsköldsvik",
+        lat: 63.288635,
+        lon: 18.716672
+    },
+    borgholm: {
+        name: "Borgholm",
+        lat: 56.879573,
+        lon: 16.654971
     }
 };
 const weekdays = [
