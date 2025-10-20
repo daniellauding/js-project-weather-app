@@ -1,5 +1,4 @@
 // * Set up some structure, set values 
-
 let timeSeries = 72;
 
 // Objekt med städer och koordinater
@@ -29,6 +28,7 @@ console.log(cities.stockholm.lat);
 
 const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
 
+//Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
 
 // * Component: Meta box
@@ -42,6 +42,7 @@ const metaBox = (result: any): HTMLElement => {
   let sunriseToday = "07:00";
   let sunsetToday = "20:00";
 
+//Bygger våran Meta information högst upp på sidan. I index.html
   div.innerHTML = `
     <ul class="meta-list">
       <li class="meta-list-item">${conditionNow} | ${temperatureNow}°C</li>
@@ -128,7 +129,7 @@ const fetchWeatherAPI = async() => {
     wrapper?.appendChild(metaBox(result));
     wrapper?.appendChild(conditionBox());
     wrapper?.appendChild(weatherWeekBox(result));
-
+//Fångar nätverks/parsefel m.m.    
   } catch(error) {
     console.log(`Error fetching: ${error}`);
   }
