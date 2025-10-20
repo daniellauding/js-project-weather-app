@@ -1,3 +1,5 @@
+// * Set up some structure, set values 
+
 let timeSeries = 72;
 
 // Objekt med städer och koordinater
@@ -9,12 +11,27 @@ const cities = {
   }
 }
 
+const weekdays = [
+ 'Sunday',
+ 'Monday',
+ 'Tuesday',
+ 'Wednesday',
+ 'Thursday',
+ 'Friday',
+ 'Saturday'
+]
+const today = new Date(); //59.341952
+// const weekdayNow = today.getDay(); //5
 
 console.log(cities.stockholm.lat);
+
+// * The API destination
 
 const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
 
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
+
+// * Component: Meta box
 
 const metaBox = (result: any): HTMLElement => { 
   const div = document.createElement('div');
@@ -35,6 +52,8 @@ const metaBox = (result: any): HTMLElement => {
 
   return div;
 };
+
+// * Component: Condition box
 
 const conditionBox = (): HTMLElement => {
   const div = document.createElement('div');
@@ -60,17 +79,7 @@ const conditionBox = (): HTMLElement => {
   return div;
 };
 
-const weekdays = [
- 'Sunday',
- 'Monday',
- 'Tuesday',
- 'Wednesday',
- 'Thursday',
- 'Friday',
- 'Saturday'
-]
-const today = new Date(); //59.341952
-// const weekdayNow = today.getDay(); //5
+// * Component: Weather week list
 
 const weatherWeekBox = (result: any): HTMLElement => {
   const div = document.createElement('div');
@@ -101,6 +110,8 @@ const weatherWeekBox = (result: any): HTMLElement => {
   return div;
 };
 
+// * Render: The actual weather with API
+
 const fetchWeatherAPI = async() => {
   try {
     const response = await fetch(API_URL);
@@ -122,5 +133,7 @@ const fetchWeatherAPI = async() => {
     console.log(`Error fetching: ${error}`);
   }
 }
+
+// * Launch the functionality
 
 fetchWeatherAPI();
