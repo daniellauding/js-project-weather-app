@@ -126,6 +126,22 @@ const fetchWeatherAPI = async() => {
     console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
     console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
 
+    let code = result.timeSeries[0].data.symbol_code;
+    code = 8
+    
+    document.body.classList.remove("theme-rainy");
+  
+    if(code === 1 || code  === 2 || code  === 3 || code === 4) {
+      document.body.classList.add("theme-sunny");
+      console.log('weather is sunny');
+    } else if (code === 5 || code === 6 || code === 7) {
+      document.body.classList.add("theme-cloudy");
+      console.log('weather is cloudy');
+    } else if (code === 8 || code === 9 || code === 10) {
+      document.body.classList.add("theme-rainy");
+      console.log('weather is rainy');
+    }  
+
     wrapper?.appendChild(metaBox(result));
     wrapper?.appendChild(conditionBox());
     wrapper?.appendChild(weatherWeekBox(result));

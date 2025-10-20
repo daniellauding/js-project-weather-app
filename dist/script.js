@@ -1,5 +1,6 @@
 // * Set up some structure, set values 
 let timeSeries = 72;
+// Objekt med städer och koordinater
 const cities = {
     stockholm: {
         name: "Stockholm",
@@ -21,6 +22,7 @@ const today = new Date(); //59.341952
 console.log(cities.stockholm.lat);
 // * The API destination
 const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
+//Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper');
 // * Component: Meta box
 const metaBox = (result) => {
@@ -30,6 +32,7 @@ const metaBox = (result) => {
     let temperatureNow = result.timeSeries[0].data.air_temperature;
     let sunriseToday = "07:00";
     let sunsetToday = "20:00";
+    //Bygger våran Meta information högst upp på sidan. I index.html
     div.innerHTML = `
     <ul class="meta-list">
       <li class="meta-list-item">${conditionNow} | ${temperatureNow}°C</li>
@@ -98,9 +101,25 @@ const fetchWeatherAPI = async () => {
         console.log("En nivå in från response:", result.timeSeries[0].data); // Första väderpunkten i listan.
         console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
         console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
+        let code = result.timeSeries[0].data.symbol_code;
+        code = 8;
+        document.body.classList.remove("theme-rainy");
+        if (code === 1 || code === 2 || code === 3 || code === 4) {
+            document.body.classList.add("theme-sunny");
+            console.log('weather is sunny');
+        }
+        else if (code === 5 || code === 6 || code === 7) {
+            document.body.classList.add("theme-cloudy");
+            console.log('weather is cloudy');
+        }
+        else if (code === 8 || code === 9 || code === 10) {
+            document.body.classList.add("theme-rainy");
+            console.log('weather is rainy');
+        }
         wrapper?.appendChild(metaBox(result));
         wrapper?.appendChild(conditionBox());
         wrapper?.appendChild(weatherWeekBox(result));
+        //Fångar nätverks/parsefel m.m.    
     }
     catch (error) {
         console.log(`Error fetching: ${error}`);
