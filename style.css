@@ -4,7 +4,7 @@
 
   /* THEMES */
 
-  --sunny-bg-color: #F7E9B9;
+  --sunny-bg-color: #bc9d36;
   --sunny-text-color: #2A5510;
 
   --rainy-bg-color: #bee9f9;
@@ -31,6 +31,8 @@ body {
   font-size: var(--font-size);
 }
 
+/* === Theme structure */
+
 body.theme-sunny {
   background-color: var(--sunny-bg-color);
   color: var(--sunny-text-color);
@@ -54,11 +56,15 @@ body.theme-cloudy {
   gap: 56px;
 }
 
+/* === Component: Meta block */
+
 .meta-list {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
+
+/* === Component: Weather hondition */
 
 #weather-condition {
   display: flex;
@@ -81,5 +87,3 @@ body.theme-cloudy {
 .weather-week-list-item:last-child {
   border: 0;
 }
-
-/* pseudo-class */
