@@ -24,7 +24,7 @@ if (cities[0]) {
     console.log(cities[0].lat);
 }
 // * The API destination
-const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0].lon}/lat/${cities[0].lat}/data.json?timeseries=${timeSeries}`;
+const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper');
 // * Component: Meta box
@@ -75,13 +75,14 @@ const weatherWeekBox = (result) => {
     for (let i = 0; i < weekdays.length; i++) {
         const day = new Date(today);
         day.setDate(today.getDate() + i);
-        const week = weekdays[day.getDay()];
+        const weekday = weekdays[day.getDay()];
+        console.log(typeof weekday);
         const dayTemp = result.timeSeries[i].data.air_temperature;
         // räkna ut avg väder
         // konvertera air_temp till -> dyngstemp
         listItems += `
       <li class="weather-week-list-item">
-        <p class="weather-week-list-item-day">${week}</p> 
+        <p class="weather-week-list-item-day">${weekday}</p> 
         <p class="weather-week-list-item-temp">${dayTemp}°C</p>
       </li>
     `;

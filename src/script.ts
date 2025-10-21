@@ -4,6 +4,22 @@ interface City {
   lon: number;
 };
 
+interface WeatherData {
+  conditionNow: number;
+  temperatureNow: number;
+  sunriseToday: number;
+  sunsetToday: number;
+  dayTemp: number;
+  timeSeries: any[];
+  /*timeSeries: Array<{
+    validTime: string;
+    data: {
+      air_temperature: number;
+      symbol_code: number;
+    }
+  }>;*/
+
+}
 
 // * Set up some structure, set values 
 let timeSeries: number = 72;
@@ -36,14 +52,14 @@ if(cities[0]) {
 
 // * The API destination
 
-const API_URL jockeps://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0].lon}/lat/${cities[0].lat}/data.json?timeseries=${timeSeries}`;
+const API_URL:string = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
 
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
 
 // * Component: Meta box
 
-const metaBox = (result: any): HTMLElement => { 
+const metaBox = (result: WeatherData): HTMLElement => { 
   const div = document.createElement('div');
   div.id = "meta"
   
@@ -92,15 +108,16 @@ const conditionBox = (): HTMLElement => {
 
 // * Component: Weather week list
 
-const weatherWeekBox = (result: any): HTMLElement => {
+const weatherWeekBox = (result: WeatherData): HTMLElement => {
   const div = document.createElement('div');
   div.id = "weather-week";
-  let listItems = '';
+  let listItems:string = '';
   
   for (let i = 0; i < weekdays.length; i++) {
     const day = new Date(today);
     day.setDate(today.getDate() + i);
-    const week = weekdays[day.getDay()];
+    const weekday:any = weekdays[day.getDay()];
+    console.log(typeof weekday);
     const dayTemp = result.timeSeries[i].data.air_temperature;
 
     // räkna ut avg väder
@@ -108,7 +125,7 @@ const weatherWeekBox = (result: any): HTMLElement => {
 
     listItems += `
       <li class="weather-week-list-item">
-        <p class="weather-week-list-item-day">${week}</p> 
+        <p class="weather-week-list-item-day">${weekday}</p> 
         <p class="weather-week-list-item-temp">${dayTemp}°C</p>
       </li>
     `;
@@ -125,7 +142,7 @@ const weatherWeekBox = (result: any): HTMLElement => {
 
 const fetchWeatherAPI = async() => {
   try {
-    const response = await fetch(API_URL);
+    const response: Response = await fetch(API_URL);
     const result = await response.json();
     if(!response.ok) {
       throw new Error(`Response status: ${response.status}`);
