@@ -36,7 +36,7 @@ if(cities[0]) {
 
 // * The API destination
 
-const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0].lon}/lat/${cities[0].lat}/data.json?timeseries=${timeSeries}`;
+const API_URL jockeps://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0].lon}/lat/${cities[0].lat}/data.json?timeseries=${timeSeries}`;
 
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
