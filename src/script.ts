@@ -61,26 +61,7 @@ const metaBox = (result: any): HTMLElement => {
 const conditionBox = (): HTMLElement => {
   const div = document.createElement('div');
   div.id = "weather-condition"
-  let icon = ''; // Placeholder for future dynamic icon handling
-  let conditionText = ''; // Placeholder for future dynamic text handling
 
-  if (icon === '') {
-    icon = 'sunny'; // Default icon
-  }else if (icon === 'cloudy') {
-    icon = 'cloudy';
-  } else if (icon === 'rainy') {
-    icon = 'rainy';
-  }
-
-  if (document.body.classList.contains("theme-sunny")) {
-    conditionText = "Get your sunnies on. Stockholm is looking rather great today!";
-  } else if (document.body.classList.contains("theme-cloudy")) {
-    conditionText = "It's a bit grey out there. A perfect day for a cozy indoor fika.";
-  } else if (document.body.classList.contains("theme-rainy")) {
-    conditionText = "Don't forget your umbrella! Stockholm is experiencing some rain today.";
-  } else {
-    conditionText = "Weather data is currently unavailable.";
-  } 
   div.innerHTML = `
     <div id="weather-condition-icon" ${icon}>
       <svg width="74" height="53" viewBox="0 0 74 53" fill="none" xmlns="http://www.w3.org/2000/svg">
