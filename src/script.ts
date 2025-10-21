@@ -26,23 +26,40 @@ console.log(cities.stockholm.lat);
 
 // * The API destination
 
-const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
+const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
+const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities.stockholm.lat}&lng=${cities.stockholm.lon}`;
 
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
 
 // * Component: Meta box
 
-const metaBox = (result: any): HTMLElement => { 
+const metaBox = async (result: any): Promise<HTMLElement> => { 
   const div = document.createElement('div');
   div.id = "meta"
   
   let conditionNow = result.timeSeries[0].data.symbol_code;
   let temperatureNow = result.timeSeries[0].data.air_temperature;
-  let sunriseToday = "07:00";
-  let sunsetToday = "20:00";
+  let sunriseToday = "Not sure when :O";
+  let sunsetToday = "Not sure when :/";
 
-//Bygger våran Meta information högst upp på sidan. I index.html
+  try {
+    const response = await fetch(SUNRISE_SUNSET_API_URL);
+    const sunResult = await response.json();
+
+    const todayDate = new Date().toISOString().split("T")[0]; // t.ex. "2025-10-21"
+
+    sunriseToday = new Date(`${todayDate} ${sunResult.results.sunrise} UTC`)
+      .toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Stockholm" }); // Convert to AM/PM
+
+    sunsetToday = new Date(`${todayDate} ${sunResult.results.sunset} UTC`)
+      .toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Stockholm" }); // Convert to AM/PM
+
+  } catch (error) {
+    console.log(`Error fetching sunrise/sunset: ${error}`);
+  }
+
+  //Bygger våran Meta information högst upp på sidan. I index.html
   div.innerHTML = `
     <ul class="meta-list">
       <li class="meta-list-item">${conditionNow} | ${temperatureNow}°C</li>
@@ -115,7 +132,7 @@ const weatherWeekBox = (result: any): HTMLElement => {
 
 const fetchWeatherAPI = async() => {
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(SMHI_API_URL);
     const result = await response.json();
     if(!response.ok) {
       throw new Error(`Response status: ${response.status}`);
@@ -142,7 +159,8 @@ const fetchWeatherAPI = async() => {
       console.log('weather is rainy');
     }  
 
-    wrapper?.appendChild(metaBox(result));
+    const meta = await metaBox(result); // vänta på async
+    wrapper?.appendChild(meta);
     wrapper?.appendChild(conditionBox());
     wrapper?.appendChild(weatherWeekBox(result));
 //Fångar nätverks/parsefel m.m.    
