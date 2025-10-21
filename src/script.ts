@@ -1,16 +1,23 @@
+interface City {
+  name: string;
+  lat: number;
+  lon: number;
+};
+
+
 // * Set up some structure, set values 
-let timeSeries = 72;
+let timeSeries: number = 72;
 
 // Objekt med städer och koordinater
-const cities = {
-  stockholm: {
+const cities: City[] = [
+  {
     name: "Stockholm",
     lat: 59.341952,
     lon: 18.053873
   }
-}
+]
 
-const weekdays = [
+const weekdays: string[] = [
  'Sunday',
  'Monday',
  'Tuesday',
@@ -22,11 +29,14 @@ const weekdays = [
 const today = new Date(); //59.341952
 // const weekdayNow = today.getDay(); //5
 
-console.log(cities.stockholm.lat);
+
+if(cities[0]) {
+  console.log(cities[0].lat);
+}
 
 // * The API destination
 
-const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
+const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0].lon}/lat/${cities[0].lat}/data.json?timeseries=${timeSeries}`;
 
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
@@ -121,7 +131,8 @@ const fetchWeatherAPI = async() => {
       throw new Error(`Response status: ${response.status}`);
     }
     console.log(result);
-    console.log("I stad:", cities.stockholm.name)
+    console.log("I stad:", cities[0]?.name
+    )
     console.log("En nivå in från response:", result.timeSeries[0].data); // Första väderpunkten i listan.
     console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
     console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
