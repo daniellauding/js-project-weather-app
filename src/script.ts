@@ -57,20 +57,21 @@ const metaBox = (result: any): HTMLElement => {
   return div;
 };
 
-const getConditionInfo = (code: number) => {
-  if ([1, 2, 3, 4].includes(code)) {
+const getConditionInfo = (code: number | string) => {
+  const c = Number(code);
+  if ([1, 2, 3, 4].includes(c)) {
     return{
       conditionText: `Get Your Sunnies on. ${cities.stockholm.name} is looking rather great today!`,
       icon: `
       <img src="assets/img/icon-sun.svg" alt="Sun Icon" />`
     };
-  }else if ([5, 6, 7].includes(code)) {
+  }else if ([5, 6, 7].includes(c)) {
     return{
       conditionText: `Light a fire and get cosy. ${cities.stockholm.name} is looking grey today.`,
       icon: `
       <img src="assets/img/icon-cloud.svg" alt="Cloud Icon" />`
     };
-  }else if ([8, 9, 10].includes(code)) {
+  }else if ([8, 9, 10].includes(c)) {
     return{
       conditionText: `Dont forget your umbrella. It's wet in ${cities.stockholm.name} today.`,
       icon: `
@@ -79,6 +80,7 @@ const getConditionInfo = (code: number) => {
     };
   }
 }
+console.log(getConditionInfo(9)); 
 
 // * Component: Condition box
 const conditionBox = (conditionText: string, icon: string): HTMLElement => {
