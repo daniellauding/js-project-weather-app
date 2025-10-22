@@ -200,7 +200,8 @@ if (cities[0]) {
     console.log(cities[0].lat);
 }
 // * The API destination
-const API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
+const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
+const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper');
 // * Component: Meta box
@@ -297,7 +298,6 @@ const fetchWeatherAPI = async () => {
         console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
         let themeKey = 'sunny';
         let code = result.timeSeries[0].data.symbol_code;
-        code = 20;
         document.body.classList.remove("theme-rainy");
         if (code === 1 || code === 2 || code === 3 || code === 4) {
             document.body.classList.add("theme-sunny");
@@ -311,7 +311,6 @@ const fetchWeatherAPI = async () => {
             document.body.classList.add("theme-rainy");
             themeKey = 'rainy';
         }
-
         const theme = THEMES[themeKey];
         const meta = await metaBox(result); // vänta på async
         wrapper?.appendChild(meta);

@@ -366,9 +366,8 @@ const fetchWeatherAPI = async() => {
 
     let themeKey: ThemeKey = 'sunny';
     let code = result.timeSeries[0].data.symbol_code;
-    code = 20
     document.body.classList.remove("theme-rainy");
-  
+    
     if(code === 1 || code  === 2 || code  === 3 || code === 4) {
       document.body.classList.add("theme-sunny");
       themeKey = 'sunny';
