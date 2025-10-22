@@ -113,15 +113,26 @@ const weatherWeekBox = (result: WeatherData): HTMLElement => {
   div.id = "weather-week";
   let listItems:string = '';
   
-  for (let i = 0; i < weekdays.length; i++) {
-    const day = new Date(today);
-    day.setDate(today.getDate() + i);
-    const weekday:any = weekdays[day.getDay()];
-    console.log(typeof weekday);
-    const dayTemp = result.timeSeries[i].data.air_temperature;
+  const day = new Date(today);
 
-    // räkna ut avg väder
-    // konvertera air_temp till -> dyngstemp
+  console.log("få ut tiden:", day);
+  // få ut tiden, vad visar vi
+  // Tue Oct 28 2025 08:42:36 GMT+0100 (Central European Standard Time)
+
+  const dailyData = result.timeSeries.filter(item => item.time.includes("T12:00:00Z"));
+  // vad för tids-epoker finns det, här ser vi att vi kan få mitt på dagen
+  // https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/times.json 
+  // så då går vi igenom hela time objektet och plockar ut bara de som är för kl 12:00
+
+  console.log("få ut temp mitt på dagen:", dailyData);
+  
+  for (let i = 0; i < weekdays.length; i++) {
+    day.setDate(today.getDate() + i);
+
+    const weekday:any = weekdays[day.getDay()];
+    // const dayTemp = result.timeSeries[i].data.air_temperature;
+    const dayTemp = dailyData[i].data.air_temperature;
+    // då använder vi denna data-punkt istället för alla weekdays
 
     listItems += `
       <li class="weather-week-list-item">
