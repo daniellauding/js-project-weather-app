@@ -1,16 +1,169 @@
+interface City {
+  name: string;
+  lat: number;
+  lon: number;
+};
+
+interface WeatherData {
+  conditionNow: number;
+  temperatureNow: number;
+  sunriseToday: number;
+  sunsetToday: number;
+  dayTemp: number;
+  timeSeries: any[];
+  /*timeSeries: Array<{
+    validTime: string;
+    data: {
+      air_temperature: number;
+      symbol_code: number;
+    }
+  }>;*/
+
+}
+
 // * Set up some structure, set values 
-let timeSeries = 72;
+let timeSeries: number = 72;
 
 // Objekt med städer och koordinater
-const cities = {
-  stockholm: {
+const cities: City[] = [
+  {
     name: "Stockholm",
     lat: 59.341952,
     lon: 18.053873
+  },
+  {
+    name: "Göteborg",
+    lat: 57.702213,
+    lon: 11.967860
+  },
+  {
+    name: "Malmö",
+    lat: 55.603875,
+    lon: 13.007694
+  },
+  {
+    name: "Uppsala",
+    lat: 59.860460,
+    lon: 17.654294
+  },
+  {
+    name: "Linköping",
+    lat: 58.414875,
+    lon: 15.614858
+  },
+  {
+    name: "Örebro",
+    lat: 59.275162,
+    lon: 15.216865
+  },
+  {
+    name: "Västerås",
+    lat: 59.604728,
+    lon: 16.542310
+  },
+  {
+    name: "Helsingborg",
+    lat: 56.065472,
+    lon: 12.796159
+  },
+  {
+    name: "Jönköping",
+    lat: 57.782668,
+    lon: 14.164872
+  },
+  {
+    name: "Norrköping", 
+    lat: 58.586242,
+    lon: 16.175980
+  },
+  {
+    name: "Umeå",
+    lat: 63.824125,
+    lon: 20.268025
+  },
+  {
+    name: "Gävle",
+    lat: 60.672642,
+    lon: 17.147048
+  },
+  {
+    name: "Borås",
+    lat: 57.720598,
+    lon: 12.946360
+  },
+  {
+    name: "Sundsvall",
+    lat: 62.388709,
+    lon: 17.306922
+  },
+  {
+    name: "Karlskrona",
+    lat: 56.161541,
+    lon: 15.601851
+  },
+  {
+    name: "Borlänge",
+    lat: 60.483976,
+    lon: 15.440760
+  },
+  {
+    name: "Åmål",
+    lat: 59.049932,
+    lon: 12.701510
+  },
+  {
+    name: "Visby",
+    lat: 57.634809,
+    lon: 18.294846
+  },
+  {
+    name: "Halmstad",
+    lat: 56.675527,
+    lon: 12.878813
+  },
+  {
+    name: "Hudiksvall",
+    lat: 61.727594,
+    lon: 17.107203
+  },
+  {
+    name: "Sveg",
+    lat: 62.035289,
+    lon: 14.362230
+  },
+  {
+    name: "Östersund",
+    lat: 63.175590,
+    lon: 14.654874
+  },
+  {
+    name: "Kiruna",
+    lat: 67.853888,
+    lon: 20.227567
+  },
+  {
+    name: "Luleå",
+    lat: 65.586872,
+    lon: 22.175487
+  },
+  {
+    name: "Karlstad",
+    lat: 59.376372,
+    lon: 13.494644
+  },
+  {
+    name: "Örnsköldsvik",
+    lat: 63.288635,
+    lon: 18.716672
+  },
+  {
+    name: "Borgholm",
+    lat: 56.879573,
+    lon: 16.654971
   }
-}
+]
 
-const weekdays = [
+const weekdays: string[] = [
  'Sunday',
  'Monday',
  'Tuesday',
@@ -22,12 +175,15 @@ const weekdays = [
 const today = new Date(); //59.341952
 // const weekdayNow = today.getDay(); //5
 
-console.log(cities.stockholm.lat);
+
+if(cities[0]) {
+  console.log(cities[0].lat);
+}
 
 // * The API destination
 
-const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities.stockholm.lon}/lat/${cities.stockholm.lat}/data.json?timeseries=${timeSeries}`;
-const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities.stockholm.lat}&lng=${cities.stockholm.lon}`;
+const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
+const SMHI_API_URL:string = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
 
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
@@ -99,23 +255,35 @@ const conditionBox = (): HTMLElement => {
 
 // * Component: Weather week list
 
-const weatherWeekBox = (result: any): HTMLElement => {
+const weatherWeekBox = (result: WeatherData): HTMLElement => {
   const div = document.createElement('div');
   div.id = "weather-week";
-  let listItems = '';
+  let listItems:string = '';
+  
+  const day = new Date(today);
+
+  console.log("få ut tiden:", day);
+  // få ut tiden, vad visar vi
+  // Tue Oct 28 2025 08:42:36 GMT+0100 (Central European Standard Time)
+
+  const dailyData = result.timeSeries.filter(item => item.time.includes("T12:00:00Z"));
+  // vad för tids-epoker finns det, här ser vi att vi kan få mitt på dagen
+  // https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/times.json 
+  // så då går vi igenom hela time objektet och plockar ut bara de som är för kl 12:00
+
+  console.log("få ut temp mitt på dagen:", dailyData);
   
   for (let i = 0; i < weekdays.length; i++) {
-    const day = new Date(today);
     day.setDate(today.getDate() + i);
-    const week = weekdays[day.getDay()];
-    const dayTemp = result.timeSeries[i].data.air_temperature;
 
-    // räkna ut avg väder
-    // konvertera air_temp till -> dyngstemp
+    const weekday:any = weekdays[day.getDay()];
+    // const dayTemp = result.timeSeries[i].data.air_temperature;
+    const dayTemp = dailyData[i].data.air_temperature;
+    // då använder vi denna data-punkt istället för alla weekdays
 
     listItems += `
       <li class="weather-week-list-item">
-        <p class="weather-week-list-item-day">${week}</p> 
+        <p class="weather-week-list-item-day">${weekday}</p> 
         <p class="weather-week-list-item-temp">${dayTemp}°C</p>
       </li>
     `;
@@ -132,13 +300,14 @@ const weatherWeekBox = (result: any): HTMLElement => {
 
 const fetchWeatherAPI = async() => {
   try {
-    const response = await fetch(SMHI_API_URL);
+    const response: Response = await fetch(SMHI_API_URL);
     const result = await response.json();
     if(!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
     console.log(result);
-    console.log("I stad:", cities.stockholm.name)
+    console.log("I stad:", cities[0]?.name
+    )
     console.log("En nivå in från response:", result.timeSeries[0].data); // Första väderpunkten i listan.
     console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
     console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
