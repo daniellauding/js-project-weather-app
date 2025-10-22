@@ -36,6 +36,136 @@ const cities: City[] = [
     name: "Stockholm",
     lat: 59.341952,
     lon: 18.053873
+  },
+  {
+    name: "Göteborg",
+    lat: 57.702213,
+    lon: 11.967860
+  },
+  {
+    name: "Malmö",
+    lat: 55.603875,
+    lon: 13.007694
+  },
+  {
+    name: "Uppsala",
+    lat: 59.860460,
+    lon: 17.654294
+  },
+  {
+    name: "Linköping",
+    lat: 58.414875,
+    lon: 15.614858
+  },
+  {
+    name: "Örebro",
+    lat: 59.275162,
+    lon: 15.216865
+  },
+  {
+    name: "Västerås",
+    lat: 59.604728,
+    lon: 16.542310
+  },
+  {
+    name: "Helsingborg",
+    lat: 56.065472,
+    lon: 12.796159
+  },
+  {
+    name: "Jönköping",
+    lat: 57.782668,
+    lon: 14.164872
+  },
+  {
+    name: "Norrköping", 
+    lat: 58.586242,
+    lon: 16.175980
+  },
+  {
+    name: "Umeå",
+    lat: 63.824125,
+    lon: 20.268025
+  },
+  {
+    name: "Gävle",
+    lat: 60.672642,
+    lon: 17.147048
+  },
+  {
+    name: "Borås",
+    lat: 57.720598,
+    lon: 12.946360
+  },
+  {
+    name: "Sundsvall",
+    lat: 62.388709,
+    lon: 17.306922
+  },
+  {
+    name: "Karlskrona",
+    lat: 56.161541,
+    lon: 15.601851
+  },
+  {
+    name: "Borlänge",
+    lat: 60.483976,
+    lon: 15.440760
+  },
+  {
+    name: "Åmål",
+    lat: 59.049932,
+    lon: 12.701510
+  },
+  {
+    name: "Visby",
+    lat: 57.634809,
+    lon: 18.294846
+  },
+  {
+    name: "Halmstad",
+    lat: 56.675527,
+    lon: 12.878813
+  },
+  {
+    name: "Hudiksvall",
+    lat: 61.727594,
+    lon: 17.107203
+  },
+  {
+    name: "Sveg",
+    lat: 62.035289,
+    lon: 14.362230
+  },
+  {
+    name: "Östersund",
+    lat: 63.175590,
+    lon: 14.654874
+  },
+  {
+    name: "Kiruna",
+    lat: 67.853888,
+    lon: 20.227567
+  },
+  {
+    name: "Luleå",
+    lat: 65.586872,
+    lon: 22.175487
+  },
+  {
+    name: "Karlstad",
+    lat: 59.376372,
+    lon: 13.494644
+  },
+  {
+    name: "Örnsköldsvik",
+    lat: 63.288635,
+    lon: 18.716672
+  },
+  {
+    name: "Borgholm",
+    lat: 56.879573,
+    lon: 16.654971
   }
 ]
 
@@ -69,6 +199,35 @@ const THEMES: Record<ThemeKey, Theme> = { //Detta talar om för TypeScript att o
     h1Text: `Light a fire and get cosy. ${cities[0]?.name} is looking grey today.`,
   },
 };
+const symbolCodeText = [
+ "Clear sky",
+ "Nearly clear sky",
+ "Variable cloudiness",
+ "Halfclear sky",
+ "Cloudy sky",
+ "Overcast",
+ "Fog",
+ "Light rain showers",
+ "Moderate rain showers",
+ "Heavy rain showers",
+ "Thunderstorm",
+ "Light sleet showers",
+ "Moderate sleet showers",
+ "Heavy sleet showers",
+ "Light snow showers",
+ "Moderate snow showers",
+ "Heavy snow showers",
+ "Light rain",
+ "Moderate rain",
+ "Heavy rain",
+ "Thunder",
+ "Light sleet",
+ "Moderate sleet",
+ "Heavy sleet",
+ "Light snowfall",
+ "Moderate snowfall",
+ "Heavy snowfall"
+];
 
 const today = new Date(); //59.341952
 // const weekdayNow = today.getDay(); //5
@@ -80,23 +239,41 @@ if(cities[0]) {
 
 // * The API destination
 
-const API_URL:string = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
+const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
+const SMHI_API_URL:string = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
 
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
 
 // * Component: Meta box
 
-const metaBox = (result: WeatherData): HTMLElement => { 
+const metaBox = async (result: any): Promise<HTMLElement> => { 
   const div = document.createElement('div');
   div.id = "meta"
   
-  let conditionNow = result.timeSeries[0].data.symbol_code;
+  let symbolCodeFromAPI = result.timeSeries[0].data.symbol_code;
+  let conditionNow = symbolCodeText[symbolCodeFromAPI -1] || "Unknown condition";
   let temperatureNow = result.timeSeries[0].data.air_temperature;
-  let sunriseToday = "07:00";
-  let sunsetToday = "20:00";
+  let sunriseToday = "Not sure when :O";
+  let sunsetToday = "Not sure when :/";
 
-//Bygger våran Meta information högst upp på sidan. I index.html
+  try {
+    const response = await fetch(SUNRISE_SUNSET_API_URL);
+    const sunResult = await response.json();
+
+    const todayDate = new Date().toISOString().split("T")[0]; // t.ex. "2025-10-21"
+
+    sunriseToday = new Date(`${todayDate} ${sunResult.results.sunrise} UTC`)
+      .toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Stockholm" }); // Convert to AM/PM
+
+    sunsetToday = new Date(`${todayDate} ${sunResult.results.sunset} UTC`)
+      .toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Stockholm" }); // Convert to AM/PM
+
+  } catch (error) {
+    console.log(`Error fetching sunrise/sunset: ${error}`);
+  }
+
+  //Bygger våran Meta information högst upp på sidan. I index.html
   div.innerHTML = `
     <ul class="meta-list">
       <li class="meta-list-item">${conditionNow} | ${temperatureNow}°C</li>
@@ -135,15 +312,26 @@ const weatherWeekBox = (result: WeatherData): HTMLElement => {
   div.id = "weather-week";
   let listItems:string = '';
   
-  for (let i = 0; i < weekdays.length; i++) {
-    const day = new Date(today);
-    day.setDate(today.getDate() + i);
-    const weekday:any = weekdays[day.getDay()];
-    console.log(typeof weekday);
-    const dayTemp = result.timeSeries[i].data.air_temperature;
+  const day = new Date(today);
 
-    // räkna ut avg väder
-    // konvertera air_temp till -> dyngstemp
+  console.log("få ut tiden:", day);
+  // få ut tiden, vad visar vi
+  // Tue Oct 28 2025 08:42:36 GMT+0100 (Central European Standard Time)
+
+  const dailyData = result.timeSeries.filter(item => item.time.includes("T12:00:00Z"));
+  // vad för tids-epoker finns det, här ser vi att vi kan få mitt på dagen
+  // https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/times.json 
+  // så då går vi igenom hela time objektet och plockar ut bara de som är för kl 12:00
+
+  console.log("få ut temp mitt på dagen:", dailyData);
+  
+  for (let i = 0; i < weekdays.length; i++) {
+    day.setDate(today.getDate() + i);
+
+    const weekday:any = weekdays[day.getDay()];
+    // const dayTemp = result.timeSeries[i].data.air_temperature;
+    const dayTemp = dailyData[i].data.air_temperature;
+    // då använder vi denna data-punkt istället för alla weekdays
 
     listItems += `
       <li class="weather-week-list-item">
@@ -164,7 +352,7 @@ const weatherWeekBox = (result: WeatherData): HTMLElement => {
 
 const fetchWeatherAPI = async() => {
   try {
-    const response: Response = await fetch(API_URL);
+    const response: Response = await fetch(SMHI_API_URL);
     const result = await response.json();
     if(!response.ok) {
       throw new Error(`Response status: ${response.status}`);
@@ -178,8 +366,7 @@ const fetchWeatherAPI = async() => {
 
     let themeKey: ThemeKey = 'sunny';
     let code = result.timeSeries[0].data.symbol_code;
-    code = 8
-    
+    code = 20
     document.body.classList.remove("theme-rainy");
   
     if(code === 1 || code  === 2 || code  === 3 || code === 4) {
@@ -194,8 +381,9 @@ const fetchWeatherAPI = async() => {
     }  
 
     const theme = THEMES[themeKey]
-
-    wrapper?.appendChild(metaBox(result));
+    const meta = await metaBox(result); // vänta på async
+    
+    wrapper?.appendChild(meta);
     wrapper?.appendChild(conditionBox(theme.h1Text, theme.iconSvg));
     wrapper?.appendChild(weatherWeekBox(result));
 //Fångar nätverks/parsefel m.m.    
