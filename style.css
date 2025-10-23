@@ -87,3 +87,50 @@ body.theme-cloudy {
 .weather-week-list-item:last-child {
   border: 0;
 }
+
+#btn-search {
+  cursor: pointer;
+  border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+}
+
+#btn-search:hover {
+  border-bottom-color: rgba(0, 0, 0, 0.8);
+}
+
+#input-search {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 99999px;
+  padding: 16px 20px;
+  display: block;
+  height: 40px;
+  transition: all 0.2s;
+  font-size: 18px;
+  outline: none;
+  width: 100%;
+  margin: 4px 0;
+}
+
+#input-search:focus {
+  border-color: rgba(0, 0, 0, 0.7);
+}
+
+#input-search:focus {
+  border-color: rgba(0, 0, 0, 0.7);
+}
+
+body.theme-sunny #input-search:focus {
+  border-color: var(--sunny-text-color);
+}
+
+body.theme-rainy #input-search:focus {
+  border-color: var(--rainy-text-color);
+}
+
+body.theme-cloudy #input-search:focus {
+  border-color: var(--cloudy-text-color);
+}
+
+body.theme-snowy #input-search:focus {
+  border-color: var(--snowy-text-color);
+}
