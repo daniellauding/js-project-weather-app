@@ -200,8 +200,8 @@ if (cities[0]) {
     console.log(cities[0].lat);
 }
 // * The API destination
-const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
-const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
+let SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
+let SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper');
 // * Component: Meta box
@@ -283,14 +283,78 @@ const weatherWeekBox = (result) => {
   `;
     return div;
 };
+// Locate me
+const locateMe = () => {
+    const div = document.createElement('div');
+    div.className = "locate-button";
+    let myLon;
+    let myLat;
+    div.innerHTML = `
+    <button id="btn-locate" class="locate-me" title="Find my location">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path
+          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+          fill="currentColor"
+        />
+        <circle cx="12" cy="9" r="2.5" fill="#fff"/>
+      </svg>
+    </button>
+  `;
+    div.addEventListener("click", function (e) {
+        if (!navigator.geolocation) {
+            console.log("Geolocation not supported.");
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const { latitude, longitude } = pos.coords;
+            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+            SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}`;
+            const proxy = "https://api.allorigins.win/get?url=";
+            SMHI_API_URL = `${proxy}${encodeURIComponent(`https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2.0/geotype/point/lon/${longitude}/lat/${latitude}/data.json`)}`;
+            console.log(SMHI_API_URL);
+            wrapper.innerHTML = "";
+            await fetchWeatherAPI();
+        }, (err) => {
+            console.log("Location error:", err.code, err.message);
+            showEmptyState("Couldn’t get your current location. Please select a city instead 📍");
+        });
+    });
+    wrapper?.appendChild(div);
+};
+const showEmptyState = (message) => {
+    if (!wrapper)
+        return;
+    wrapper.innerHTML = `
+    <div class="empty-state">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="8" y1="15" x2="16" y2="15"></line>
+        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+      </svg>
+      <p>${message}</p>
+      <button class="retry">Restart</button>
+    </div>
+  `;
+    // Restart app completely
+    document.querySelector(".retry")?.addEventListener("click", async () => {
+        wrapper.innerHTML = "<p>Loading...</p>";
+        // sätt om till defaultstad (Stockholm)
+        SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0].lon}/lat/${cities[0].lat}/data.json?timeseries=${timeSeries}`;
+        SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0].lat}&lng=${cities[0].lon}`;
+        // kör om hela appen
+        await fetchWeatherAPI();
+    });
+};
 // * Render: The actual weather with API
 const fetchWeatherAPI = async () => {
     try {
         const response = await fetch(SMHI_API_URL);
-        const result = await response.json();
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
+        const data = await response.json();
+        const result = data.contents ? JSON.parse(data.contents) : data;
         console.log(result);
         console.log("I stad:", cities[0]?.name);
         console.log("En nivå in från response:", result.timeSeries[0].data); // Första väderpunkten i listan.
@@ -313,13 +377,20 @@ const fetchWeatherAPI = async () => {
         }
         const theme = THEMES[themeKey];
         const meta = await metaBox(result); // vänta på async
+        wrapper.innerHTML = "";
         wrapper?.appendChild(meta);
         wrapper?.appendChild(conditionBox(theme.h1Text, theme.iconSvg));
         wrapper?.appendChild(weatherWeekBox(result));
+        locateMe();
+        if (!result?.timeSeries?.length) {
+            showEmptyState("No weather data available for this location 😕");
+            return;
+        }
         //Fångar nätverks/parsefel m.m.    
     }
     catch (error) {
         console.log(`Error fetching: ${error}`);
+        showEmptyState("Could not load weather data. Try again later ☁️");
     }
 };
 // * Launch the functionality
