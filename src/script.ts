@@ -166,6 +166,11 @@ const cities: City[] = [
     name: "Borgholm",
     lat: 56.879573,
     lon: 16.654971
+  },
+  {
+    name: "Lund",
+    lat: 55.69540977435169,
+    lon: 13.195831044896282
   }
 ]
 
@@ -427,8 +432,8 @@ const showEmptyState = (message: string) => {
     wrapper!.innerHTML = "<p>Loading...</p>";
 
     // sätt om till defaultstad (Stockholm)
-    SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0].lon}/lat/${cities[0].lat}/data.json?timeseries=${timeSeries}`;
-    SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0].lat}&lng=${cities[0].lon}`;
+    SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
+    SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
 
     // kör om hela appen
     await fetchWeatherAPI();
