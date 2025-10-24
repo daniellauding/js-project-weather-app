@@ -371,17 +371,56 @@ const fetchWeatherAPI = async (city = cities[0]) => {
         let themeKey = 'sunny';
         let code = result.timeSeries[0].data.symbol_code;
         document.body.classList.remove("theme-rainy");
+        let divConditionStyle = document.createElement('div');
+        divConditionStyle.innerHTML = ``;
+        wrapper?.appendChild(divConditionStyle);
         if (code === 1 || code === 2 || code === 3 || code === 4) {
             document.body.classList.add("theme-sunny");
             themeKey = 'sunny';
+            divConditionStyle.innerHTML = `
+        <div id="sky">
+          <div class="theSun">
+            <div class="ray_box">
+              <div class="ray ray1"></div>
+              <div class="ray ray2"></div>
+              <div class="ray ray3"></div>
+              <div class="ray ray4"></div>
+              <div class="ray ray5"></div>
+              <div class="ray ray6"></div>
+              <div class="ray ray7"></div>
+              <div class="ray ray8"></div>
+              <div class="ray ray9"></div>
+              <div class="ray ray10"></div>
+            </div>
+          </div>
+        </div>`;
         }
         else if (code === 5 || code === 6 || code === 7) {
             document.body.classList.add("theme-cloudy");
             themeKey = 'cloudy';
+            divConditionStyle.innerHTML = `
+        <div class="clouds">
+          <div class="x1">
+            <div class="cloud"></div>
+          </div>
+          <div class="x2">
+            <div class="cloud"></div>
+          </div>
+          <div class="x3">
+            <div class="cloud"></div>
+          </div>
+          <div class="x4">
+            <div class="cloud"></div>
+          </div>
+          <div class="x5">
+            <div class="cloud"></div>
+          </div>
+        </div>`;
         }
         else if (code === 8 || code === 9 || code === 10 || code === 12 || code === 13 || code === 14 || code === 18 || code === 19 || code === 20 || code === 22 || code === 23 || code === 24) {
             document.body.classList.add("theme-rainy");
             themeKey = 'rainy';
+            divConditionStyle.innerHTML = `<i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i>`;
         }
         else if (code === 11 || code === 21) {
             document.body.classList.add("theme-stormy");
@@ -390,6 +429,15 @@ const fetchWeatherAPI = async (city = cities[0]) => {
         else if (code === 15 || code === 16 || code === 17 || code === 25 || code === 26 || code === 27) {
             document.body.classList.add("theme-snowy");
             themeKey = 'snowy';
+            divConditionStyle.innerHTML = `
+        <div class="snowfall">
+          <div class="snow"></div>
+          <div class="snow"></div>
+          <div class="snow"></div>
+          <div class="snow"></div>
+          <div class="snow"></div>
+        </div>
+      `;
         }
         const theme = THEMES[themeKey];
         const meta = await metaBox(result, city);
