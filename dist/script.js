@@ -302,11 +302,9 @@ const search = () => {
     const searchButton = document.getElementById('btn-search');
     if (!searchButton)
         return;
-    // console.log(searchButton);
     const originalHTML = searchButton.innerHTML;
     searchButton?.addEventListener("click", function (e) {
         e.stopPropagation();
-        // ⏱ small delay lets the click finish before DOM changes
         setTimeout(() => {
             searchButton.innerHTML = `
         <div id="search-wrapper">
@@ -463,7 +461,7 @@ toggleButton.className = "toggle-btn";
 document.body.prepend(toggleButton);
 let showingAll = false;
 const showAllCities = async () => {
-    wrapper.innerHTML = ""; // töm wrapper
+    wrapper.innerHTML = "";
     const cardsContainer = document.createElement("div");
     cardsContainer.id = "weather-cards";
     for (const city of cities) {

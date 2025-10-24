@@ -369,14 +369,12 @@ const search = () => {
 
   const searchButton = document.getElementById('btn-search');
   if (!searchButton) return;
-  // console.log(searchButton);
 
   const originalHTML = searchButton.innerHTML;
 
   searchButton?.addEventListener("click", function (e) {
       e.stopPropagation();
-
-    // ⏱ small delay lets the click finish before DOM changes
+      
     setTimeout(() => {
       searchButton.innerHTML = `
         <div id="search-wrapper">
@@ -517,16 +515,16 @@ const fetchWeatherAPI = async(city: City = cities[0]!) => {
         </div>`;
     } else if (code === 8 || code === 9 || code === 10 || code === 12 || code === 13 || code === 14  || code === 18 || code === 19  || code === 20 || code === 22 || code === 23 || code === 24) {
       document.body.className = document.body.className.replace(/\btheme-\S+\b/g, '').trim()
-       document.body.classList.add("theme-rainy");
+      document.body.classList.add("theme-rainy");
       themeKey = 'rainy';
         divConditionStyle.innerHTML = `<i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i>`;
     } else if (code === 11 || code === 21) {
       document.body.className = document.body.className.replace(/\btheme-\S+\b/g, '').trim()
-       document.body.classList.add("theme-stormy");
+      document.body.classList.add("theme-stormy");
       themeKey = 'stormy';
     } else if (code === 15 || code === 16 || code === 17 || code === 25 || code === 26 || code === 27) {
       document.body.className = document.body.className.replace(/\btheme-\S+\b/g, '').trim()
-       document.body.classList.add("theme-snowy");
+      document.body.classList.add("theme-snowy");
       themeKey = 'snowy';
       divConditionStyle.innerHTML = `
         <div class="snowfall">
@@ -562,7 +560,7 @@ document.body.prepend(toggleButton);
 let showingAll = false;
 
 const showAllCities = async () => {
-  wrapper!.innerHTML = ""; // töm wrapper
+  wrapper!.innerHTML = "";
 
   const cardsContainer = document.createElement("div");
   cardsContainer.id = "weather-cards";
