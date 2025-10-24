@@ -13,6 +13,12 @@
   --cloudy-bg-color: #f9fdfe;
   --cloudy-text-color: #f37676;
 
+  --snowy-bg-color: #37a0f6;
+  --snowy-text-color: #dcf1ff;
+
+  --stormy-bg-color:  #334155;
+  --stormy-text-color: #cfc839;
+
   --font-size: 21px;
   --font-family: "Montserrat", sans-serif;
 
@@ -46,6 +52,16 @@ body.theme-rainy {
 body.theme-cloudy {
   background-color: var(--cloudy-bg-color);
   color: var(--cloudy-text-color);
+}
+
+body.theme-snowy {
+  background-color: var(--snowy-bg-color);
+  color: var(--snowy-text-color);
+}
+
+body.theme-stormy {
+  background-color: var(--stormy-bg-color);
+  color: var(--stormy-text-color);
 }
 
 #wrapper {
