@@ -228,6 +228,23 @@ const metaBox = async (result, city) => {
     try {
         const response = await fetch(`https://api.sunrise-sunset.org/json?lat=${city.lat}&lng=${city.lon}`);
         const sunResult = await response.json();
+        const to24Hour = (timeStr = "") => {
+            const [time, modifier] = timeStr?.split(" ") ?? ["00:00:00", "AM"];
+            if (!time)
+                return "00:00:00";
+            const parts = time.split(":").map(Number);
+            const hours = parts[0] ?? 0;
+            const minutes = parts[1] ?? 0;
+            const seconds = parts[2] ?? 0;
+            let adjustedHours = hours;
+            if (modifier === "PM" && hours < 12)
+                adjustedHours += 12;
+            if (modifier === "AM" && hours === 12)
+                adjustedHours = 0;
+            return `${adjustedHours.toString().padStart(2, "0")}:${minutes}:${seconds}`;
+        };
+        const sunriseUTC = new Date(`1970-01-01T${to24Hour(sunResult.results.sunrise)}Z`);
+        const sunsetUTC = new Date(`1970-01-01T${to24Hour(sunResult.results.sunset)}Z`);
         const todayDate = new Date().toISOString().split("T")[0]; // t.ex. "2025-10-21"
         sunriseToday = new Date(`${todayDate} ${sunResult.results.sunrise} UTC`)
             .toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Stockholm" }); // Convert to AM/PM
@@ -498,7 +515,12 @@ toggleButton.className = "toggle-btn";
 document.body.prepend(toggleButton);
 let showingAll = false;
 const showAllCities = async () => {
-    wrapper.innerHTML = "";
+    wrapper.innerHTML = `
+    <div class="loader">
+      Loading cities...
+      <img class="img-load" src="../assets/img/loading.gif" />
+    </div
+  `;
     const cardsContainer = document.createElement("div");
     cardsContainer.id = "weather-cards";
     for (const city of cities) {
@@ -521,6 +543,7 @@ const showAllCities = async () => {
             console.log(`Error fetching for ${city.name}:`, error);
         }
     }
+    wrapper.innerHTML = "";
     wrapper?.appendChild(cardsContainer);
 };
 toggleButton.addEventListener("click", () => {
