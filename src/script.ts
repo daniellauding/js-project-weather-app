@@ -184,6 +184,15 @@ const weekdays: string[] = [
  'Saturday'
 ]
 
+const snapToNearestGrid = (lat: number, lon: number): { lat: number; lon: number } => {
+  // SMHI grid ≈ 0.025° mellan punkter (~2.5 km)
+  const snap = (v: number) => Math.round(v / 0.025) * 0.025;
+  return {
+    lat: parseFloat(snap(lat).toFixed(3)),
+    lon: parseFloat(snap(lon).toFixed(3))
+  };
+}
+
 type ThemeKey = 'sunny' | 'cloudy' | 'rainy';
 
 const THEMES: Record<ThemeKey, Theme> = { //Detta talar om för TypeScript att objektet har nycklar av typen ThemeKey och att varje värde ska följa Theme interface.
@@ -245,7 +254,10 @@ if(cities[0]) {
 // * The API destination
 
 let SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
-let SMHI_API_URL:string = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
+const proxy = "https://api.allorigins.win/get?url=";
+let SMHI_API_URL: string = `${proxy}${encodeURIComponent(
+  `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`
+)}`;
 
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper') as HTMLElement | null;
@@ -330,7 +342,9 @@ const weatherWeekBox = (result: WeatherData): HTMLElement => {
 
   console.log("få ut temp mitt på dagen:", dailyData);
   
-  for (let i = 0; i < weekdays.length; i++) {
+  for (let i = 0; i < Math.min(dailyData.length, weekdays.length); i++) {
+    const dataPoint = dailyData[i];
+    if (!dataPoint?.data) continue;
     day.setDate(today.getDate() + i);
 
     const weekday:any = weekdays[day.getDay()];
@@ -352,6 +366,22 @@ const weatherWeekBox = (result: WeatherData): HTMLElement => {
 
   return div;
 };
+
+// 🔍 Hitta närmaste stad baserat på lat/lon via SMHI:s geodata
+async function getNearestCity(lat: number, lon: number) {
+  // SMHI:s interna geosökning – tar även koordinater
+  const geoUrl = `https://wpt-a-tst.smhi.se/backend-startpage/geo/autocomplete/places/${lat},${lon}?sweonly=true`;
+  try {
+    const res = await fetch(geoUrl);
+    if (!res.ok) throw new Error("Geo lookup failed");
+    const data = await res.json();
+    console.log("🧭 Geo lookup result:", data?.[0]);
+    return data?.[0] || null;
+  } catch (err) {
+    console.warn("⚠️ Could not fetch nearest city:", err);
+    return null;
+  }
+}
 
 // Locate me
 
@@ -383,20 +413,32 @@ const locateMe = () => {
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const { latitude, longitude } = pos.coords;
+        let { latitude, longitude } = pos.coords;
         console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
 
+        // 🧭 Försök hitta närmaste stad via SMHI:s geodata
+        const nearest = await getNearestCity(latitude, longitude);
+        if (nearest) {
+          console.log(`📍 Using nearest city: ${nearest.place} (${nearest.lat}, ${nearest.lon})`);
+          latitude = nearest.lat;
+          longitude = nearest.lon;
+
+          // 👀 Visa logg i UI under vädret
+          const notice = document.createElement("p");
+          notice.className = "geo-notice";
+          notice.innerHTML = `📍 Using nearest SMHI location: <strong>${nearest.place}</strong>`;
+          document.querySelector("#wrapper")?.prepend(notice);
+        }
+
+        // ☀️ Sunrise/sunset API
         SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}`;
-        
-        const proxy = "https://api.allorigins.win/get?url=";
-        SMHI_API_URL = `${proxy}${encodeURIComponent(
-          `https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2.0/geotype/point/lon/${longitude}/lat/${latitude}/data.json`
-        )}`;
 
-        console.log(SMHI_API_URL);
+        // 🌤 Nya SMHI-endpointen (ingen proxy, modern struktur)
+        SMHI_API_URL = `https://opendata.smhi.se/metfcst/pmp3g/v2/point/lat/${latitude}/lon/${longitude}`;
         
+        console.log("🌤 Using SMHI URL:", SMHI_API_URL);
+
         wrapper!.innerHTML = "";
-
         await fetchWeatherAPI();
       },
       (err) => {
@@ -445,14 +487,81 @@ const showEmptyState = (message: string) => {
 const fetchWeatherAPI = async() => {
   try {
 
-    const response: Response = await fetch(SMHI_API_URL);
+    let response: Response = await fetch(SMHI_API_URL);
+
+    try {
+      response = await fetch(SMHI_API_URL);
+    } catch (e) {
+      console.warn("🌐 CORS block detected, retrying via proxy...");
+      const proxy = "https://api.allorigins.win/get?url=";
+      const encoded = encodeURIComponent(SMHI_API_URL);
+      const proxyRes = await fetch(`${proxy}${encoded}`);
+      const proxyJson = await proxyRes.json();
+      response = new Response(proxyJson.contents, { status: proxyRes.status });
+    }
+
+    if (response.status === 404 && SMHI_API_URL.includes("lat")) {
+      console.warn("404 from SMHI — retrying with nearest grid point...");
+      const match = SMHI_API_URL.match(/lon\/([0-9.]+)\/lat\/([0-9.]+)/);
+      if (match && match[1] && match[2]) {
+        const lon = parseFloat(match[1]);
+        const lat = parseFloat(match[2]);
+        const snapped = snapToNearestGrid(lat, lon);
+
+        SMHI_API_URL = SMHI_API_URL.replace(
+          /lon\/[0-9.]+\/lat\/[0-9.]+/,
+          `lon/${snapped.lon}/lat/${snapped.lat}`
+        );
+
+        console.log("🔁 Retrying with:", snapped.lat, snapped.lon);
+        response = await fetch(SMHI_API_URL);
+      }
+    }
     
     if(!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
     
-    const data = await response.json();
-    const result = data.contents ? JSON.parse(data.contents) : data;
+    let result = await response.json();
+
+    if (result && result.contents) {
+      try {
+        if (result.contents.trim().startsWith("{")) {
+          result = JSON.parse(result.contents);
+        } else {
+        // 💡 Proxy gav HTML (troligen 404 från SMHI) → försök närmaste gridpunkt
+        console.warn("⚠️ Proxy returned HTML, trying nearest grid point…");
+        const match = SMHI_API_URL.match(/lon\/([0-9.]+)\/lat\/([0-9.]+)/);
+        if (match && match[1] && match[2]) {
+          const lon = parseFloat(match[1]);
+          const lat = parseFloat(match[2]);
+          const snapped = snapToNearestGrid(lat, lon);
+          console.log("%c🔁 Snapping to nearest grid:", "color: lightgreen", snapped);
+
+          // 🚫 Här skippar vi proxyn och går direkt mot SMHI
+          const smhiDirectUrl = `https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2.0/geotype/point/lon/${snapped.lon}/lat/${snapped.lat}/data.json`;
+
+          const retryRes = await fetch(smhiDirectUrl);
+          if (!retryRes.ok) {
+            console.error("❌ Still no data after snapping to grid:", retryRes.status);
+            showEmptyState("Couldn’t find nearby SMHI data grid for this location 😕");
+            return;
+          }
+
+          const retryJson = await retryRes.json();
+          result = retryJson; // ✅ använd nya datan
+        } else {
+          console.error("⚠️ Proxy returned non-JSON response:", result.contents.slice(0, 200));
+          showEmptyState("SMHI data not available for your location. Try another city 📍");
+          return;
+        }
+      }
+      } catch (e) {
+        console.error("Failed to parse proxied JSON:", e);
+        showEmptyState("Invalid data format received from SMHI ❌");
+        return;
+      }
+    }
 
     console.log(result);
     console.log("I stad:", cities[0]?.name
