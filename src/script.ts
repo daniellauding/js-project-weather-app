@@ -366,7 +366,7 @@ const weatherWeekBox = (result: WeatherData): HTMLElement => {
     day.setDate(today.getDate() + i);
 
     const weekday:any = weekdays[day.getDay()];
-    const dayTemp = dailyData[i].data.air_temperature;
+    const dayTemp = dailyData[i]?.data?.air_temperature || "N/A";
 
     listItems += `
       <li class="weather-week-list-item">

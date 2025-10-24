@@ -306,7 +306,7 @@ const weatherWeekBox = (result) => {
     for (let i = 0; i < weekdays.length; i++) {
         day.setDate(today.getDate() + i);
         const weekday = weekdays[day.getDay()];
-        const dayTemp = dailyData[i].data.air_temperature;
+        const dayTemp = dailyData[i]?.data?.air_temperature || "N/A";
         listItems += `
       <li class="weather-week-list-item">
         <p class="weather-week-list-item-day">${weekday}</p> 
