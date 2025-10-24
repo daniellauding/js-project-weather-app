@@ -391,6 +391,67 @@ const fetchWeatherAPI = async() => {
   }
 }
 
+// Show multiple cities desktop mode
+
+const toggleButton = document.createElement("button");
+toggleButton.textContent = "☰";
+toggleButton.className = "toggle-btn";
+document.body.prepend(toggleButton);
+
+let showingAll = false;
+
+const showAllCities = async () => {
+  wrapper!.innerHTML = ""; // töm wrapper
+
+  const cardsContainer = document.createElement("div");
+  cardsContainer.id = "weather-cards";
+
+  for (const city of cities) {
+    await new Promise(resolve => setTimeout(resolve, 150));
+    try {
+      const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${city.lon}/lat/${city.lat}/data.json?timeseries=${timeSeries}`;
+      const response = await fetch(SMHI_API_URL);
+      const result = await response.json();
+
+      const code = result.timeSeries[0].data.symbol_code;
+      let themeKey: ThemeKey = code <= 4 ? "sunny" : code <= 7 ? "cloudy" : "rainy";
+      const theme = THEMES[themeKey];
+
+      const card = document.createElement("div");
+      card.className = `weather-card ${theme.className}`;
+
+      card.appendChild(await metaBox(result));
+      card.appendChild(
+        conditionBox(
+          theme.h1Text.replace(cities[0]!.name, city.name),
+          theme.iconSvg
+        )
+      );
+      card.appendChild(weatherWeekBox(result));
+
+      cardsContainer.appendChild(card);
+    } catch (error) {
+      console.log(`Error fetching for ${city.name}:`, error);
+    }
+  }
+
+  wrapper?.appendChild(cardsContainer);
+};
+
+toggleButton.addEventListener("click", () => {
+  if (!showingAll) {
+    showAllCities();
+    wrapper?.classList.add("fluid");
+    toggleButton.textContent = "✕";
+  } else {
+    wrapper!.innerHTML = "";
+    wrapper?.classList.remove("fluid");
+    fetchWeatherAPI();
+    toggleButton.textContent = "☰";
+  }
+  showingAll = !showingAll;
+});
+
 // * Launch the functionality
 
 fetchWeatherAPI();

@@ -33,17 +33,17 @@ body {
 
 /* === Theme structure */
 
-body.theme-sunny {
+.theme-sunny {
   background-color: var(--sunny-bg-color);
   color: var(--sunny-text-color);
 }
 
-body.theme-rainy {
+.theme-rainy {
   background-color: var(--rainy-bg-color);
   color: var(--rainy-text-color);
 }
 
-body.theme-cloudy {
+.theme-cloudy {
   background-color: var(--cloudy-bg-color);
   color: var(--cloudy-text-color);
 }
@@ -54,6 +54,10 @@ body.theme-cloudy {
   margin: var(--wrapper-margin);
   max-width: var(--wrapper-max-width);
   gap: 56px;
+}
+
+#wrapper.fluid {
+  max-width: none;;
 }
 
 /* === Component: Meta block */
@@ -86,4 +90,59 @@ body.theme-cloudy {
 
 .weather-week-list-item:last-child {
   border: 0;
+}
+
+.toggle-btn {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  padding: 16px;
+  background: none;
+  border: none;
+  color: #222;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 100;
+  display: none;
+}
+
+@media (min-width: 580px) {
+  .toggle-btn {
+    display: block;
+  }
+}
+
+#weather-cards {
+  display: flex;
+  gap: 32px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  margin: 40px 40px 40px 90px;
+  scroll-behavior: smooth;
+  transition: all 0.3s ease;
+}
+
+.weather-card {
+  flex: 0 0 280px;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  scroll-snap-align: start;
+  transition: transform 0.2s ease;
+  max-width: var(--wrapper-max-width);
+  width: var(--wrapper-max-width);
+}
+
+#weather-cards::-webkit-scrollbar {
+  height: 8px;
+}
+
+#weather-cards::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+#weather-cards::-webkit-scrollbar-track {
+  background: transparent;
 }
