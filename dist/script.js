@@ -200,12 +200,12 @@ if (cities[0]) {
     console.log(cities[0].lat);
 }
 // * The API destination
-const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
-const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
+// const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
+// const SMHI_API_URL:string = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
 //Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
 const wrapper = document.getElementById('wrapper');
 // * Component: Meta box
-const metaBox = async (result) => {
+const metaBox = async (result, city) => {
     const div = document.createElement('div');
     div.id = "meta";
     let symbolCodeFromAPI = result.timeSeries[0].data.symbol_code;
@@ -214,7 +214,7 @@ const metaBox = async (result) => {
     let sunriseToday = "Not sure when :O";
     let sunsetToday = "Not sure when :/";
     try {
-        const response = await fetch(SUNRISE_SUNSET_API_URL);
+        const response = await fetch(`https://api.sunrise-sunset.org/json?lat=${city.lat}&lng=${city.lon}`);
         const sunResult = await response.json();
         const todayDate = new Date().toISOString().split("T")[0]; // t.ex. "2025-10-21"
         sunriseToday = new Date(`${todayDate} ${sunResult.results.sunrise} UTC`)
@@ -298,12 +298,33 @@ const search = () => {
         setTimeout(() => {
             searchButton.innerHTML = `
         <div id="search-wrapper">
-          <input type="search" id="input-search" placeholder="Search" />
-          </button>
+          <input type="search" id="input-search" placeholder="Sök stad..." />
+          <ul id="search-results"></ul>
         </div>
       `;
             const input = document.getElementById("input-search");
+            const resultsList = document.getElementById("search-results");
             input?.focus();
+            input?.addEventListener("input", () => {
+                const searchText = input.value.trim().toLowerCase();
+                resultsList.innerHTML = "";
+                if (searchText === "")
+                    return;
+                const matches = cities.filter(city => city.name.toLowerCase().includes(searchText));
+                matches.forEach(city => {
+                    const li = document.createElement("li");
+                    li.textContent = city.name;
+                    li.className = "search-result-item";
+                    li.addEventListener("click", async () => {
+                        console.log("✅ Vald stad:", city.name);
+                        const newSMHI = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${city.lon}/lat/${city.lat}/data.json?timeseries=${timeSeries}`;
+                        console.log("New API URL:", newSMHI);
+                        await fetchWeatherAPI(city);
+                        closeSearch();
+                    });
+                    resultsList.appendChild(li);
+                });
+            });
             const closeSearch = () => {
                 searchButton.innerHTML = originalHTML;
                 document.removeEventListener("click", outsideHandler);
@@ -319,14 +340,18 @@ const search = () => {
     });
 };
 // * Render: The actual weather with API
-const fetchWeatherAPI = async () => {
+const fetchWeatherAPI = async (city = cities[0]) => {
+    const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${city.lon}/lat/${city.lat}/data.json?timeseries=${timeSeries}`;
+    const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${city.lat}&lng=${city.lon}`;
     try {
         const response = await fetch(SMHI_API_URL);
         const result = await response.json();
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
+        wrapper.innerHTML = "";
         console.log(result);
+        console.log(`Stad: ${city.name}`);
         console.log("I stad:", cities[0]?.name);
         console.log("En nivå in från response:", result.timeSeries[0].data); // Första väderpunkten i listan.
         console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
@@ -347,9 +372,9 @@ const fetchWeatherAPI = async () => {
             themeKey = 'rainy';
         }
         const theme = THEMES[themeKey];
-        const meta = await metaBox(result); // vänta på async
+        const meta = await metaBox(result, city);
         wrapper?.appendChild(meta);
-        wrapper?.appendChild(conditionBox(theme.h1Text, theme.iconSvg));
+        wrapper?.appendChild(conditionBox(theme.h1Text.replace(cities[0].name, city.name), theme.iconSvg));
         wrapper?.appendChild(weatherWeekBox(result));
         search();
         //Fångar nätverks/parsefel m.m.    

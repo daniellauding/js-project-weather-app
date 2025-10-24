@@ -54,6 +54,7 @@ body.theme-cloudy {
   margin: var(--wrapper-margin);
   max-width: var(--wrapper-max-width);
   gap: 56px;
+  transition: opacity 0.3s ease-in-out;
 }
 
 /* === Component: Meta block */
@@ -133,4 +134,12 @@ body.theme-cloudy #input-search:focus {
 
 body.theme-snowy #input-search:focus {
   border-color: var(--snowy-text-color);
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
 }
