@@ -1,9 +1,13 @@
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                                Setup typescript                                ||
+// ! ||--------------------------------------------------------------------------------||
 ;
 ;
 ;
-// * Set up some structure, set values 
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                        Set up some structure, set values                       ||
+// ! ||--------------------------------------------------------------------------------||
 let timeSeries = 72;
-// Objekt med städer och koordinater
 const cities = [
     {
         name: "Stockholm",
@@ -150,6 +154,7 @@ const weekdays = [
     'Friday',
     'Saturday'
 ];
+const today = new Date(); //59.341952
 const THEMES = {
     sunny: {
         className: 'theme-sunny',
@@ -177,6 +182,9 @@ const THEMES = {
         h1Text: `Maybe stay inside... or watch out! It's stormy in <span id="btn-search">${cities[0]?.name}</span> today.`,
     },
 };
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                                  Conditionals                                  ||
+// ! ||--------------------------------------------------------------------------------||
 const symbolCodeText = [
     "Clear sky",
     "Nearly clear sky",
@@ -206,17 +214,13 @@ const symbolCodeText = [
     "Moderate snowfall",
     "Heavy snowfall"
 ];
-const today = new Date(); //59.341952
-// const weekdayNow = today.getDay(); //5
-if (cities[0]) {
-    console.log(cities[0].lat);
-}
-// * The API destination
-// const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${cities[0]?.lat}&lng=${cities[0]?.lon}`;
-// const SMHI_API_URL:string = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${cities[0]?.lon}/lat/${cities[0]?.lat}/data.json?timeseries=${timeSeries}`;
-//Hämtar wrapper-elementet där vi lägger in UI-komponenterna.
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                                      Setup                                     ||
+// ! ||--------------------------------------------------------------------------------||
 const wrapper = document.getElementById('wrapper');
-// * Component: Meta box
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                               Component: Meta box                              ||
+// ! ||--------------------------------------------------------------------------------||
 const metaBox = async (result, city) => {
     const div = document.createElement('div');
     div.id = "meta";
@@ -228,6 +232,9 @@ const metaBox = async (result, city) => {
     try {
         const response = await fetch(`https://api.sunrise-sunset.org/json?lat=${city.lat}&lng=${city.lon}`);
         const sunResult = await response.json();
+        // ! ||--------------------------------------------------------------------------------||
+        // ! ||                          Convert to 24hour for netlify                         ||
+        // ! ||--------------------------------------------------------------------------------||
         const to24Hour = (timeStr = "") => {
             const [timePart, modifier] = timeStr.trim().split(" ");
             if (!timePart)
@@ -244,7 +251,6 @@ const metaBox = async (result, city) => {
                 .toString()
                 .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
         };
-        const todayDate = new Date().toISOString().split("T")[0]; // t.ex. "2025-10-21"
         const sunriseUTC = new Date(`1970-01-01T${to24Hour(sunResult.results.sunrise)}Z`);
         const sunsetUTC = new Date(`1970-01-01T${to24Hour(sunResult.results.sunset)}Z`);
         sunriseToday = sunriseUTC.toLocaleTimeString("sv-SE", {
@@ -261,7 +267,6 @@ const metaBox = async (result, city) => {
     catch (error) {
         console.log(`Error fetching sunrise/sunset: ${error}`);
     }
-    //Bygger våran Meta information högst upp på sidan. I index.html
     div.innerHTML = `
     <ul class="meta-list">
       <li class="meta-list-item">${conditionNow} | ${temperatureNow}°C</li>
@@ -271,7 +276,9 @@ const metaBox = async (result, city) => {
   `;
     return div;
 };
-// * Component: Condition box
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                            Component: Condition box                            ||
+// ! ||--------------------------------------------------------------------------------||
 const conditionBox = (h1Text, iconSvg) => {
     const div = document.createElement('div');
     div.id = "weather-condition";
@@ -287,26 +294,19 @@ const conditionBox = (h1Text, iconSvg) => {
   `;
     return div;
 };
-// * Component: Weather week list
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                          Component: Weather week list                          ||
+// ! ||--------------------------------------------------------------------------------||
 const weatherWeekBox = (result) => {
     const div = document.createElement('div');
     div.id = "weather-week";
     let listItems = '';
     const day = new Date(today);
-    console.log("få ut tiden:", day);
-    // få ut tiden, vad visar vi
-    // Tue Oct 28 2025 08:42:36 GMT+0100 (Central European Standard Time)
     const dailyData = result.timeSeries.filter(item => item.time.includes("T12:00:00Z"));
-    // vad för tids-epoker finns det, här ser vi att vi kan få mitt på dagen
-    // https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/times.json 
-    // så då går vi igenom hela time objektet och plockar ut bara de som är för kl 12:00
-    console.log("få ut temp mitt på dagen:", dailyData);
     for (let i = 0; i < weekdays.length; i++) {
         day.setDate(today.getDate() + i);
         const weekday = weekdays[day.getDay()];
-        // const dayTemp = result.timeSeries[i].data.air_temperature;
         const dayTemp = dailyData[i].data.air_temperature;
-        // då använder vi denna data-punkt istället för alla weekdays
         listItems += `
       <li class="weather-week-list-item">
         <p class="weather-week-list-item-day">${weekday}</p> 
@@ -319,7 +319,9 @@ const weatherWeekBox = (result) => {
   `;
     return div;
 };
-// Search feature
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                                 Search feature                                 ||
+// ! ||--------------------------------------------------------------------------------||
 const search = () => {
     const div = document.createElement('div');
     div.className = "search-wrapper";
@@ -350,9 +352,7 @@ const search = () => {
                     li.textContent = city.name;
                     li.className = "search-result-item";
                     li.addEventListener("click", async () => {
-                        console.log("✅ Vald stad:", city.name);
                         const newSMHI = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${city.lon}/lat/${city.lat}/data.json?timeseries=${timeSeries}`;
-                        console.log("New API URL:", newSMHI);
                         await fetchWeatherAPI(city);
                         closeSearch();
                     });
@@ -373,6 +373,9 @@ const search = () => {
         }, 50);
     });
 };
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                                    Locate me                                   ||
+// ! ||--------------------------------------------------------------------------------||
 const locateMe = () => {
     const div = document.createElement('div');
     div.className = "locate-button";
@@ -394,7 +397,6 @@ const locateMe = () => {
         }
         navigator.geolocation.getCurrentPosition(async (pos) => {
             const { latitude, longitude } = pos.coords;
-            console.log("🌍 Location:", latitude, longitude);
             const myCity = {
                 name: "Your location",
                 lat: latitude,
@@ -408,12 +410,16 @@ const locateMe = () => {
     });
     document.body.prepend(div);
 };
-// * Render: The actual weather with API
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                       Render: The actual weather with API                      ||
+// ! ||--------------------------------------------------------------------------------||
 const fetchWeatherAPI = async (city = cities[0]) => {
+    // ! ||--------------------------------------------------------------------------------||
+    // ! ||                               Max 6 after decimal                              ||
+    // ! ||--------------------------------------------------------------------------------||
     const lat = city.lat.toFixed(5);
     const lon = city.lon.toFixed(5);
     const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${lon}/lat/${lat}/data.json?timeseries=${timeSeries}`;
-    const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lon}`;
     try {
         const response = await fetch(SMHI_API_URL);
         const result = await response.json();
@@ -421,12 +427,6 @@ const fetchWeatherAPI = async (city = cities[0]) => {
             throw new Error(`Response status: ${response.status}`);
         }
         wrapper.innerHTML = "";
-        console.log(result);
-        console.log(`Stad: ${city.name}`);
-        console.log("I stad:", cities[0]?.name);
-        console.log("En nivå in från response:", result.timeSeries[0].data); // Första väderpunkten i listan.
-        console.log("Få ut temperatur:", result.timeSeries[0].data.air_temperature);
-        console.log("Få ut symbol:", result.timeSeries[0].data.symbol_code);
         let themeKey = 'sunny';
         let code = result.timeSeries[0].data.symbol_code;
         document.body.classList.remove("theme-rainy");
@@ -509,13 +509,14 @@ const fetchWeatherAPI = async (city = cities[0]) => {
         wrapper?.appendChild(conditionBox(theme.h1Text.replace(cities[0].name, city.name), theme.iconSvg));
         wrapper?.appendChild(weatherWeekBox(result));
         search();
-        //Fångar nätverks/parsefel m.m.    
     }
     catch (error) {
         console.log(`Error fetching: ${error}`);
     }
 };
-// Show multiple cities desktop mode
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                        Show multiple cities desktop mode                       ||
+// ! ||--------------------------------------------------------------------------------||
 const toggleButton = document.createElement("button");
 toggleButton.textContent = "☰";
 toggleButton.className = "toggle-btn";
@@ -567,7 +568,9 @@ toggleButton.addEventListener("click", () => {
     }
     showingAll = !showingAll;
 });
-// * Launch the functionality
+// ! ||--------------------------------------------------------------------------------||
+// ! ||                            Launch the functionality                            ||
+// ! ||--------------------------------------------------------------------------------||
 fetchWeatherAPI();
 locateMe();
 export {};
