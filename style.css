@@ -3959,3 +3959,59 @@ svg {
 #weather-cards::-webkit-scrollbar-track {
   background: transparent;
 }
+
+.locate-me {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #222;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.25s, transform 0.1s;
+  backdrop-filter: blur(4px);
+}
+
+.locate-me:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+.locate-me:active {
+  transform: scale(0.95);
+}
+
+.locate-me svg {
+  width: 22px;
+  height: 22px;
+  color: currentColor;
+  pointer-events: none;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+}
+.empty-state svg {
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+.empty-state button.retry {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  background: #ddd;
+  cursor: pointer;
+}
+.empty-state button.retry:hover {
+  background: #ccc;
+}

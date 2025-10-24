@@ -437,12 +437,60 @@ const search = () => {
 
 }
 
+const locateMe = () => {
+  const div = document.createElement('div');
+  div.className = "locate-button"
+
+  div.innerHTML=`
+    <button id="btn-locate" class="locate-me" title="Find my location">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path
+          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+          fill="currentColor"
+        />
+        <circle cx="12" cy="9" r="2.5" fill="#fff"/>
+      </svg>
+    </button>
+  `;
+
+  div.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported in this browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        console.log("🌍 Location:", latitude, longitude);
+
+        const myCity: City = {
+          name: "Your location",
+          lat: latitude,
+          lon: longitude,
+        };
+
+        await fetchWeatherAPI(myCity);
+      },
+      (err) => {
+        console.error("Location error:", err);
+        alert("Could not get your location. Please allow location access.");
+      }
+    );
+  });
+
+  document.body.prepend(div);
+};
+
 // * Render: The actual weather with API
 
 const fetchWeatherAPI = async(city: City = cities[0]!) => {
-  
-  const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${city.lon}/lat/${city.lat}/data.json?timeseries=${timeSeries}`;
-  const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${city.lat}&lng=${city.lon}`;
+
+  const lat = city.lat.toFixed(5);
+  const lon = city.lon.toFixed(5);
+
+  const SMHI_API_URL = `https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/${lon}/lat/${lat}/data.json?timeseries=${timeSeries}`;
+  const SUNRISE_SUNSET_API_URL = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lon}`;
 
   try {
     const response: Response = await fetch(SMHI_API_URL);
@@ -614,3 +662,4 @@ toggleButton.addEventListener("click", () => {
 // * Launch the functionality
 
 fetchWeatherAPI();
+locateMe();
