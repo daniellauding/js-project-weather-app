@@ -473,6 +473,7 @@ const fetchWeatherAPI = async(city: City = cities[0]!) => {
     wrapper?.appendChild(divConditionStyle);
   
     if(code === 1 || code  === 2 || code  === 3 || code === 4) {
+      document.body.className = document.body.className.replace(/\btheme-\S+\b/g, '').trim()
       document.body.classList.add("theme-sunny");
       themeKey = 'sunny';
       divConditionStyle.innerHTML = `
@@ -493,6 +494,7 @@ const fetchWeatherAPI = async(city: City = cities[0]!) => {
           </div>
         </div>`;
     } else if (code === 5 || code === 6 || code === 7) {
+      document.body.className = document.body.className.replace(/\btheme-\S+\b/g, '').trim()
        document.body.classList.add("theme-cloudy");
        themeKey = 'cloudy';
        divConditionStyle.innerHTML = `
@@ -514,13 +516,16 @@ const fetchWeatherAPI = async(city: City = cities[0]!) => {
           </div>
         </div>`;
     } else if (code === 8 || code === 9 || code === 10 || code === 12 || code === 13 || code === 14  || code === 18 || code === 19  || code === 20 || code === 22 || code === 23 || code === 24) {
+      document.body.className = document.body.className.replace(/\btheme-\S+\b/g, '').trim()
        document.body.classList.add("theme-rainy");
       themeKey = 'rainy';
         divConditionStyle.innerHTML = `<i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i><i class="rain"></i>`;
     } else if (code === 11 || code === 21) {
+      document.body.className = document.body.className.replace(/\btheme-\S+\b/g, '').trim()
        document.body.classList.add("theme-stormy");
       themeKey = 'stormy';
     } else if (code === 15 || code === 16 || code === 17 || code === 25 || code === 26 || code === 27) {
+      document.body.className = document.body.className.replace(/\btheme-\S+\b/g, '').trim()
        document.body.classList.add("theme-snowy");
       themeKey = 'snowy';
       divConditionStyle.innerHTML = `
